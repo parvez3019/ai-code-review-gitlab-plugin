@@ -1,5 +1,5 @@
 {
-  "name": "@hataiit9x/gemini-review-code",
+  "name": "@parvez3019/gemini-review-code",
   "version": "1.0.0",
   "main": "index.js",
   "bin": {
@@ -16,7 +16,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hataiit9x/gemini-review-code"
+    "url": "git+https://github.com/parvez3019/gemini-review-code"
   },
   "dependencies": {
     "@types/axios": "^0.14.0",
@@ -32,9 +32,9 @@
   },
   "description": "![](preview.png)",
   "bugs": {
-    "url": "https://github.com/hataiit9x/gemini-review-code/issues"
+    "url": "https://github.com/parvez3019/gemini-review-code/issues"
   },
-  "homepage": "https://github.com/hataiit9x/gemini-review-code#readme",
+  "homepage": "https://github.com/parvez3019/gemini-review-code#readme",
   "keywords": [
     "AI",
     "Gemini",
@@ -43,5 +43,5 @@
     "Gitlab CI",
     "Gitlab"
   ],
-  "author": "Tai.Ha"
+  "author": "parvez.hassan"
 }
