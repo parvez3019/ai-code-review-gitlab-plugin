@@ -1,13 +1,14 @@
-# @hataiit9x/gemini-review-code
+# @parvez3019/gemini-review-code
 
-[![npm version](https://badge.fury.io/js/%40hataiit9x%2Freview-code-ai.svg)](https://badge.fury.io/js/%40hataiit9x%2Freview-code-ai)
+Based on - https://github.com/hataiit9x/gemini-review-code
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Summary
 
 ![](preview.png)
 
-`@hataiit9x/gemini-review-code` It is a small tool used for code review in GitLab Merge Requests. It supports calling the GitLab API for private 
+`@parvez3019/gemini-review-code` It is a small tool used for code review in GitLab Merge Requests. It supports calling the GitLab API for private 
 deployment and uses the Gemini AI API to obtain review results. Please note that when using it, ensure compliance with company regulations. 😉
 
 
@@ -26,7 +27,7 @@ deployment and uses the Gemini AI API to obtain review results. Please note that
 ## Install
 
 ```sh
-npm i @hataiit9x/gemini-review-code
+npm i @parvez3019/gemini-review-code
 `````
 
 ## Use
@@ -63,8 +64,8 @@ Code Review:
   stage: merge-request  
   image: node:16
   script:
-    - npm i @hataiit9x/gemini-review-code -g
-    - gemini-review-code -t "$GITLAB_TOKEN" -a "$API_KEY" -c "$CUSTOM_MODELS" -p "$CI_MERGE_REQUEST_PROJECT_ID" -m "$CI_MERGE_REQUEST_ID"
+    - npm i @parvez3019/gemini-review-code -g
+    - gemini-review-code -t "$GITLAB_TOKEN" -a "$API_KEY" -c "$CUSTOM_MODELS" -p "$CI_MERGE_REQUEST_PROJECT_ID" -m "$CI_MERGE_REQUEST_IID"
   only:
     - merge_requests
   when: on_success
