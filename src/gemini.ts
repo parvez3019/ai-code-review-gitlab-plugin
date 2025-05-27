@@ -27,18 +27,30 @@ const SAFETY_SETTINGS = [
 
 export class Gemini implements AICodeReviewClient {
     private apiClient: AxiosInstance;
+    private apiKey: string;
+    private apiUrl: string;
+    private model: string;
 
     constructor(config: AIClientConfig) {
+        if (!config.apiKey) {
+            throw new Error("API key is required for Gemini client");
+        }
+
+        this.apiKey = config.apiKey;
+        this.apiUrl = config.apiUrl || process.env.GEMINI_API_URL || "https://generativelanguage.googleapis.com";
+        this.model = config.model || process.env.GEMINI_MODEL || geminiCompletionsConfig.model;
+
         this.apiClient = axios.create({
-            baseURL: config.apiUrl,
+            baseURL: this.apiUrl,
         });
     }
 
     async reviewCodeChange(change: string): Promise<string> {
-        const apiKey = process.env.GEMINI_API_KEY || "";
-        const geminiAPIURL = process.env.GEMINI_API_URL || "";
-        const model = process.env.GEMINI_MODEL || geminiCompletionsConfig.model;
-        const url = `${geminiAPIURL}/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        if (!change?.trim()) {
+            throw new Error("Code change cannot be empty");
+        }
+
+        const url = `/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`;
         const headers = {
             'Content-Type': 'application/json',
             'User-Agent':
@@ -67,14 +79,25 @@ export class Gemini implements AICodeReviewClient {
             },
             safetySettings: SAFETY_SETTINGS,
         };
-        const response = await this.apiClient.post(url, body, {
-            headers: headers,
-        });
 
-        if (response.status < 200 || response.status >= 300) {
-            throw new Error('Request failed');
+        try {
+            const response = await this.apiClient.post(url, body, {
+                headers: headers,
+            });
+
+            if (response.status < 200 || response.status >= 300) {
+                throw new Error(`Request failed with status ${response.status}`);
+            }
+
+            const data = response.data;
+            if (!data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+                throw new Error("Invalid response format from Gemini");
+            }
+
+            return data.candidates[0].content.parts[0].text;
+        } catch (error) {
+            console.error("Error calling Gemini:", error);
+            throw new Error(`Failed to get code review from Gemini: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
-        const data = response.data;
-        return data.candidates[0].content.parts[0].text;
     }
 }

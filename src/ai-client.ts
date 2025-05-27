@@ -3,8 +3,9 @@ export interface AICodeReviewClient {
 }
 
 export interface AIClientConfig {
-    apiUrl?: string;
-    accessToken?: string;
+    apiKey: string;
+    apiSecret?: string;  // Optional for Gemini, required for Bedrock
+    apiUrl?: string;     // Optional, used by Gemini client
     model?: string;
     region?: string;
 } 

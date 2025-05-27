@@ -40,10 +40,8 @@ export AWS_ACCESS_KEY_ID="your-aws-access-key"
 export AWS_SECRET_ACCESS_KEY="your-aws-secret-key"
 export AWS_REGION="us-east-1"
 # Available Claude models in Bedrock:
-# - anthropic.claude-3-sonnet-20240229-v1:0
-# - anthropic.claude-3-haiku-20240307-v1:0
-# - anthropic.claude-instant-v1
-export AWS_BEDROCK_MODEL="anthropic.claude-3-sonnet-20240229-v1:0"
+# - anthropic.claude-3-5-sonnet-20241022-v2:0
+export AWS_BEDROCK_MODEL="anthropic.claude-3-5-sonnet-20241022-v2:0"
 ```
 
 ### Gemini Configuration

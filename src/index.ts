@@ -19,6 +19,9 @@ program
     .option('-c, --custom-model <string>', 'Custom Model ID')
     .parse(process.argv);
 
+const GEMINI = 'gemini';
+const BEDROCK = 'bedrock';
+
 async function createAIClient(): Promise<AICodeReviewClient> {
     const {
         aiProvider,
@@ -28,17 +31,22 @@ async function createAIClient(): Promise<AICodeReviewClient> {
         customModel,
     } = program.opts();
 
+    if (!apiKey) {
+        throw new Error('API Key is required');
+    }
+
     const config: AIClientConfig = {
-        apiUrl: 'https://generativelanguage.googleapis.com',
-        accessToken: apiKey,
+        apiKey: apiKey,
+        apiSecret: apiSecret,
         model: customModel,
         region: region,
     };
 
     switch (aiProvider.toLowerCase()) {
-        case 'gemini':
+        case GEMINI:
+            config.apiUrl = 'https://generativelanguage.googleapis.com';
             return new Gemini(config);
-        case 'bedrock':
+        case BEDROCK:
             if (!apiSecret) {
                 throw new Error('AWS Secret Access Key is required for Bedrock');
             }
