@@ -1,6 +1,6 @@
 {
-  "name": "@parvez3019/gemini-review-code",
-  "version": "1.0.3",
+  "name": "@parvez3019/ai-code-review-gitlab-plugin",
+  "version": "0.0.1",
   "main": "index.js",
   "bin": {
     "gemini-review-code": "bin/index.js"
@@ -16,7 +16,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/parvez3019/gemini-review-code"
+    "url": "git+https://github.com/parvez3019/ai-code-review-gitlab-plugin"
   },
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.525.0",
@@ -36,9 +36,9 @@
   },
   "description": "![](preview.png)",
   "bugs": {
-    "url": "https://github.com/parvez3019/gemini-review-code/issues"
+    "url": "https://github.com/parvez3019/ai-code-review-gitlab-plugin/issues"
   },
-  "homepage": "https://github.com/parvez3019/gemini-review-code#readme",
+  "homepage": "https://github.com/parvez3019/ai-code-review-gitlab-plugin#readme",
   "keywords": [
     "AI",
     "Gemini",
@@ -49,5 +49,5 @@
     "AWS Bedrock",
     "Claude"
   ],
-  "author": "parvez.hassan"
+  "author": "parvez3019"
 }
