@@ -96,10 +96,75 @@ code-review:
     - stg
 ```
 
-Make sure to set the following variables in your GitLab CI/CD settings:
-- `CODE_REVIEW_GITLAB_TOKEN`: Your GitLab access token
-- `CODE_REVIEW_API_KEY`: Your Gemini API key or AWS access key
-- `CODE_REVIEW_CUSTOM_MODELS`: (Optional) Custom model ID
+### Alternative Trigger Methods
+
+#### 1. Using GitLab Webhooks
+
+You can set up automatic code reviews when you are added as a reviewer using GitLab Webhooks:
+
+1. Go to your GitLab project settings
+2. Navigate to Webhooks
+3. Add a new webhook with the following settings:
+   - URL: Your webhook endpoint (e.g., AWS Lambda function URL)
+   - Trigger: Select "Merge request events"
+   - Secret token: Generate a secure token
+
+4. Create a webhook handler (example using AWS Lambda):
+
+```javascript
+exports.handler = async (event) => {
+    const payload = JSON.parse(event.body);
+    
+    // Check if this is a merge request event
+    if (payload.object_kind === 'merge_request') {
+        // Check if the action is adding a reviewer
+        if (payload.action === 'reviewer') {
+            // Check if you are the added reviewer
+            const yourGitlabId = 'YOUR_GITLAB_USER_ID';
+            const addedReviewers = payload.changes.reviewers?.current || [];
+            
+            if (addedReviewers.some(reviewer => reviewer.id === yourGitlabId)) {
+                // Trigger the code review
+                const response = await fetch('https://gitlab.com/api/v4/projects/' + 
+                    payload.project.id + '/merge_requests/' + 
+                    payload.object_attributes.iid + '/pipeline', {
+                    method: 'POST',
+                    headers: {
+                        'PRIVATE-TOKEN': process.env.GITLAB_TOKEN
+                    }
+                });
+            }
+        }
+    }
+    
+    return {
+        statusCode: 200,
+        body: JSON.stringify('Webhook processed')
+    };
+};
+```
+
+This setup will:
+1. Listen for merge request events
+2. Check if you are added as a reviewer
+3. Automatically trigger the code review pipeline when you are added
+
+Make sure to:
+- Replace `YOUR_GITLAB_USER_ID` with your actual GitLab user ID
+- Set up the necessary environment variables in your webhook handler
+- Configure proper security measures for your webhook endpoint
+
+#### 2. Using GitLab API Directly
+
+You can also trigger the code review directly using the GitLab API:
+
+```bash
+curl --request POST \
+  --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+  "https://gitlab.com/api/v4/projects/$PROJECT_ID/merge_requests/$MR_IID/pipeline"
+```
+
+This can be integrated into your existing workflows or automation scripts.
 
 ### Options
 
