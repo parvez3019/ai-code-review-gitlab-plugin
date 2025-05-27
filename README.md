@@ -1,4 +1,4 @@
-# @parvez3019/gemini-review-code
+# @parvez3019/ai-code-review-gitlab-plugin
 
 Based on - https://github.com/hataiit9x/gemini-review-code
 
@@ -8,7 +8,7 @@ Based on - https://github.com/hataiit9x/gemini-review-code
 
 ![](preview.png)
 
-`@parvez3019/gemini-review-code` It is a small tool used for code review in GitLab Merge Requests. It supports calling the GitLab API for private 
+`@parvez3019/ai-code-review-gitlab-plugin` It is a small tool used for code review in GitLab Merge Requests. It supports calling the GitLab API for private 
 deployment and uses either Gemini AI API or AWS Bedrock (Claude) to obtain review results. Please note that when using it, ensure compliance with company regulations. 😉
 
 
@@ -30,7 +30,7 @@ deployment and uses either Gemini AI API or AWS Bedrock (Claude) to obtain revie
 ## Install
 
 ```sh
-npm i @parvez3019/gemini-review-code
+npm i @parvez3019/ai-code-review-gitlab-plugin
 ```
 
 ## Environment Variables
@@ -65,7 +65,7 @@ export AI_PROVIDER="bedrock"  # or "gemini"
 ### Command Line Arguments
 
 ```bash
-gemini-review-code \
+ai-code-review-gitlab-plugin \
   --gitlab-api-url "https://gitlab.com/api/v4" \
   --gitlab-access-token "your-gitlab-token" \
   --project-id 123 \
