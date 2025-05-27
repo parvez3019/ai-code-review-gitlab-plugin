@@ -75,6 +75,30 @@ gemini-review-code \
   --custom-model "model-id"  # optional
 ```
 
+### GitLab CI/CD Integration
+
+Add the following to your `.gitlab-ci.yml` file to enable automated code reviews:
+
+```yaml
+code-review:
+  stage: code-review
+  image: node:20
+  script:
+    - npm i -g @parvez3019/ai-code-review-gitlab-plugin
+    - ai-code-review-gitlab-plugin -t "$CODE_REVIEW_GITLAB_TOKEN" -p "$CI_MERGE_REQUEST_PROJECT_ID" -m "$CI_MERGE_REQUEST_IID" -a bedrock -k "$AWS_ACCESS_KEY_ID" -s "$AWS_SECRET_ACCESS_KEY" -r "us-east-1" -c "anthropic.claude-3-5-sonnet-20241022-v2:0"
+  only:
+    - merge_requests
+  when: manual
+  tags:
+    - build
+    - stg
+```
+
+Make sure to set the following variables in your GitLab CI/CD settings:
+- `CODE_REVIEW_GITLAB_TOKEN`: Your GitLab access token
+- `CODE_REVIEW_API_KEY`: Your Gemini API key or AWS access key
+- `CODE_REVIEW_CUSTOM_MODELS`: (Optional) Custom model ID
+
 ### Options
 
 | Option | Description | Default | Required |
