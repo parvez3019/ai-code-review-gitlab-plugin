@@ -1,6 +1,6 @@
 {
   "name": "@parvez3019/gemini-review-code",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "index.js",
   "bin": {
     "gemini-review-code": "bin/index.js"
