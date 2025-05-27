@@ -107,8 +107,6 @@ async function run() {
                             console.log('Too Many Requests, try again');
                             await delay(60 * 1000);
                             diffBlocks.push(item);
-                        } else {
-                            console.error('Error reviewing code:', e);
                         }
                     }
                 }
