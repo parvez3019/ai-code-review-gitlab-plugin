@@ -15,14 +15,16 @@ deployment and uses either Gemini AI API or AWS Bedrock (Claude) to obtain revie
 ## Features
 
 - 🛠️ Support configuration GitLab API address
-- ⚙️ Support configuration Gemini API Key to implement load balancing of interface calls (multiple Keys are separated by commas)
-- 📦 Support configuration Gemini custom model ID
+- ⚙️ Support configuration AWS Bedrock (Claude) for code review
+- 📦 Support configuration AWS Bedrock custom model ID
 - 📦 Support configuration GitLab Project ID
 - 📦 Support configuration GitLab Merge Request ID
 - 🚀 Support running in CI/CD
 - 🚦 Automatically wait and try again when the rate limit is exceeded
 - 💬 The review results are appended to the location of the corresponding code block in the form of comments
-- 🤖 Support for both Gemini and AWS Bedrock (Claude) models
+- 🔒 Secure handling of AWS credentials and GitLab tokens
+- 🌐 Support for AWS Bedrock Claude models
+- 🏷️ Easy integration with GitLab CI/CD pipelines
 
 
 ## Install
