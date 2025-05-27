@@ -19,12 +19,16 @@
     "url": "git+https://github.com/parvez3019/gemini-review-code"
   },
   "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.525.0",
     "@types/axios": "^0.14.0",
     "@types/commander": "^2.12.2",
     "@types/node": "^20.2.1",
     "axios": "^1.4.0",
     "commander": "^10.0.1",
     "typescript": "^5.0.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "publishConfig": {
     "access": "public",
@@ -41,7 +45,9 @@
     "Code",
     "Reviewer",
     "Gitlab CI",
-    "Gitlab"
+    "Gitlab",
+    "AWS Bedrock",
+    "Claude"
   ],
   "author": "parvez.hassan"
 }

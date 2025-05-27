@@ -1,9 +1,11 @@
 import axios, {AxiosInstance} from 'axios';
 import {
     geminiCompletionsConfig,
-    geminiSuggestContent,
-    geminiSystemContent,
+    codeReviewPrompt,
+    systemPrompt,
 } from "./utils";
+import { AICodeReviewClient, AIClientConfig } from "./ai-client";
+
 const SAFETY_SETTINGS = [
     {
         category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
@@ -23,20 +25,20 @@ const SAFETY_SETTINGS = [
     },
 ]
 
-export class Gemini {
+export class Gemini implements AICodeReviewClient {
     private apiClient: AxiosInstance;
 
-    constructor(private apiUrl: string, private accessToken: string, private customModel?: string) {
+    constructor(config: AIClientConfig) {
         this.apiClient = axios.create({
-            baseURL: apiUrl,
+            baseURL: config.apiUrl,
         });
     }
 
     async reviewCodeChange(change: string): Promise<string> {
-        const apiKey = this.accessToken
-        const geminiAPIURL = this.apiUrl
-        const model = this.customModel || geminiCompletionsConfig.model
-        const url = `${geminiAPIURL}/v1beta/models/${model}:generateContent?key=${apiKey}` // change to generateContent
+        const apiKey = process.env.GEMINI_API_KEY || "";
+        const geminiAPIURL = process.env.GEMINI_API_URL || "";
+        const model = process.env.GEMINI_MODEL || geminiCompletionsConfig.model;
+        const url = `${geminiAPIURL}/v1beta/models/${model}:generateContent?key=${apiKey}`;
         const headers = {
             'Content-Type': 'application/json',
             'User-Agent':
@@ -56,10 +58,10 @@ export class Gemini {
             systemInstruction: {
                 parts: [
                     {
-                        text: geminiSystemContent
+                        text: systemPrompt
                     },
                     {
-                        text: geminiSuggestContent
+                        text: codeReviewPrompt
                     }
                 ]
             },

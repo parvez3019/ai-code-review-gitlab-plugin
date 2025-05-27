@@ -1,37 +1,84 @@
 import {Command} from 'commander';
 import {GitLab} from './gitlab';
 import {Gemini} from './gemini';
+import {BedrockClient} from './bedrock';
+import {AICodeReviewClient, AIClientConfig} from './ai-client';
 import {delay, getDiffBlocks, getLineObj} from "./utils";
 
 const program = new Command();
 
 program
-    .option('-g, --gitlab-api-url <string>', 'GitLab API URL', ' https://gitlab.com/api/v4')
+    .option('-g, --gitlab-api-url <string>', 'GitLab API URL', 'https://gitlab.com/api/v4')
     .option('-t, --gitlab-access-token <string>', 'GitLab Access Token')
-    .option('-a, --api-key <string>', 'Gemini API Key')
     .option('-p, --project-id <number>', 'GitLab Project ID')
     .option('-m, --merge-request-id <string>', 'GitLab Merge Request ID')
-    .option('-c, --custom-model <string>', 'Custom Model ID', 'gemini-1.5-flash')
+    .option('-a, --ai-provider <string>', 'AI Provider (gemini or bedrock)', 'gemini')
+    .option('-k, --api-key <string>', 'API Key (Gemini API Key or AWS Access Key ID)')
+    .option('-s, --api-secret <string>', 'API Secret (AWS Secret Access Key for Bedrock)')
+    .option('-r, --region <string>', 'AWS Region for Bedrock', 'us-east-1')
+    .option('-c, --custom-model <string>', 'Custom Model ID')
     .parse(process.argv);
+
+async function createAIClient(): Promise<AICodeReviewClient> {
+    const {
+        aiProvider,
+        apiKey,
+        apiSecret,
+        region,
+        customModel,
+    } = program.opts();
+
+    const config: AIClientConfig = {
+        apiUrl: 'https://generativelanguage.googleapis.com',
+        accessToken: apiKey,
+        model: customModel,
+        region: region,
+    };
+
+    switch (aiProvider.toLowerCase()) {
+        case 'gemini':
+            return new Gemini(config);
+        case 'bedrock':
+            if (!apiSecret) {
+                throw new Error('AWS Secret Access Key is required for Bedrock');
+            }
+            return new BedrockClient(config);
+        default:
+            throw new Error(`Unsupported AI provider: ${aiProvider}`);
+    }
+}
 
 async function run() {
     const {
         gitlabApiUrl,
         gitlabAccessToken,
-        apiKey,
         projectId,
         mergeRequestId,
-        customModel,
     } = program.opts();
-    const gitlab = new GitLab({gitlabApiUrl, gitlabAccessToken, projectId, mergeRequestId});
-    let aiClient;
-    aiClient = new Gemini('https://generativelanguage.googleapis.com', apiKey, customModel); // create a new instance of the Gemini class
+
+    const gitlab = new GitLab({
+        gitlabApiUrl,
+        gitlabAccessToken,
+        projectId,
+        mergeRequestId
+    });
+
+    let aiClient: AICodeReviewClient;
+    try {
+        aiClient = await createAIClient();
+    } catch (error) {
+        console.error('Failed to create AI client:', error);
+        process.exit(1);
+    }
+
     await gitlab.init().catch(() => {
-        console.log('gitlab init error')
+        console.log('gitlab init error');
     });
+
     const changes = await gitlab.getMergeRequestChanges().catch(() => {
-        console.log('get merge request changes error')
+        console.log('get merge request changes error');
     });
+
     for (const change of changes) {
         if (change.renamed_file || change.deleted_file || !change?.diff?.startsWith('@@')) {
             continue;
@@ -52,6 +99,8 @@ async function run() {
                             console.log('Too Many Requests, try again');
                             await delay(60 * 1000);
                             diffBlocks.push(item);
+                        } else {
+                            console.error('Error reviewing code:', e);
                         }
                     }
                 }
