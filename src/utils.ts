@@ -15,7 +15,7 @@ export const geminiSuggestContent = "Next, I will send you each step of the merg
     "                        - Use bullet points if you have multiple comments.\n" +
     "                        - You don't have to explain what the code does\n" +
     "                        - Follow the system prompt carefully\n" +
-    "                        - Make small small suggestions for improvement\n" +
+    "                        - Keep you suggestions short and concise with code examples if required\n" +
     "                        Here are the changes that were committed this time"
 
 export const geminiCompletionsConfig = {
