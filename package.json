@@ -1,6 +1,6 @@
 {
   "name": "@parvez3019/ai-code-review-gitlab-plugin",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "index.js",
   "bin": {
     "ai-code-review-gitlab-plugin": "bin/index.js"
