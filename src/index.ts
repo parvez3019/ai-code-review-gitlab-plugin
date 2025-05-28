@@ -88,6 +88,8 @@ async function run() {
         console.log('get merge request changes error');
     });
 
+    const noFeedbackLogs: Array<{file: string, line: any, code: string}> = [];
+
     for (const change of changes) {
         if (change.renamed_file || change.deleted_file || !change?.diff?.startsWith('@@')) {
             continue;
@@ -104,6 +106,17 @@ async function run() {
                         const suggestion = await aiClient.reviewCodeChange(item);
                         if (suggestion === NO_REVIEW_CONTENT_PLACEHOLDER) {
                             console.log('No feedback for this change', lineObj);
+                            // Extract code lines from the diff block
+                            const codeLines = item.split('\n')
+                                .filter(line => line.startsWith('+') || line.startsWith('-'))
+                                .map(line => line.substring(1)) // Remove the + or - prefix
+                                .join('\n');
+                            
+                            noFeedbackLogs.push({
+                                file: change.new_path,
+                                line: lineObj,
+                                code: codeLines
+                            });
                             continue;
                         }
                         await gitlab.addReviewComment(lineObj, change, suggestion);
@@ -118,6 +131,16 @@ async function run() {
             }
         }
     }
+
+    // Add summary comment for no feedback logs
+    if (noFeedbackLogs.length > 0) {
+        const summaryMessage = `### No Feedback Summary\n\nThe following changes were reviewed and required no further feedback, great work 💪 :\n\n${noFeedbackLogs.map(log => 
+            `- File: \`${log.file}\`, Line: ${log.line.new_line} - ${log.line.old_line}`
+        ).join('\n')}`;
+        
+        await gitlab.addComment(summaryMessage);
+    }
+
     console.log('done');
 }
 

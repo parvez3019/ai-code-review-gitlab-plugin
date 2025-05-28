@@ -102,4 +102,11 @@ export class GitLab {
         });
         return response.data;
     }
+
+    async addComment(body: string) {
+        const response = await this.apiClient.post(`/projects/${this.projectId}/merge_requests/${this.mrId}/notes`, {
+            body: body
+        });
+        return response.data;
+    }
 }
