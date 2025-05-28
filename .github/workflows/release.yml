@@ -15,6 +15,12 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Install dependencies
         run: npm ci
+      - name: Who am I?
+        run: npm whoami
+      - name: Check if package is already published
+        run: npm view @parvez3019/ai-code-review-gitlab-plugin version
+      - name: Check if package is already published
+        run: npm view @parvez3019/ai-code-review-gitlab-plugin version
       - name: Build package
         run: npm run build
       - name: Configure npm authentication
