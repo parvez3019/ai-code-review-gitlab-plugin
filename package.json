@@ -34,7 +34,7 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
-  "description": "![](preview.png)",
+  "description": "![](screenshots/screenshot-1.png)",
   "bugs": {
     "url": "https://github.com/parvez3019/ai-code-review-gitlab-plugin/issues"
   },

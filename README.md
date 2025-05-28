@@ -6,8 +6,7 @@ Based on - https://github.com/hataiit9x/gemini-review-code
 
 ## Summary
 
-`@parvez3019/ai-code-review-gitlab-plugin` It is a small tool used for code review in GitLab Merge Requests. It supports calling the GitLab API for private 
-deployment and uses either Gemini AI API or AWS Bedrock (Claude) to obtain review results. Please note that when using it, ensure compliance with company regulations. 😉
+`@parvez3019/ai-code-review-gitlab-plugin` It is a small tool used for inline code review in GitLab Merge Requests. It supports calling the GitLab API for adding inline review comments and uses either Gemini AI API or AWS Bedrock to obtain AI code review feedbacks. Please note that when using it, ensure compliance with company regulations. 😉
 
 
 
