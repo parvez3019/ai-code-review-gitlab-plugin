@@ -56,6 +56,7 @@ async function createAIClient(): Promise<AICodeReviewClient> {
     }
 }
 
+const NO_REVIEW_CONTENT_PLACEHOLDER = '204';
 async function run() {
     const {
         gitlabApiUrl,
@@ -101,6 +102,10 @@ async function run() {
                 if ((lineObj?.new_line && lineObj?.new_line > 0) || (lineObj.old_line && lineObj.old_line > 0)) {
                     try {
                         const suggestion = await aiClient.reviewCodeChange(item);
+                        if (suggestion === NO_REVIEW_CONTENT_PLACEHOLDER) {
+                            console.log('No feedback for this change', lineObj);
+                            continue;
+                        }
                         await gitlab.addReviewComment(lineObj, change, suggestion);
                     } catch (e: any) {
                         if (e?.response?.status === 429) {

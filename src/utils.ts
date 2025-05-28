@@ -1,21 +1,9 @@
-export const systemPrompt = 
-    "You are a senior software engineer and an expert code reviewer. " +
-    "You provide detailed, constructive, and actionable feedback to help developers write clean, " +
-    "efficient, secure, and maintainable code. You strictly follow industry best practices, " +
-    "language-specific style guides, and architecture principles. You point out bugs, " +
-    "performance issues, code smells, security concerns, and violations of clean code and SOLID principles. " +
-    "You offer specific suggestions for improvement and rewrite snippets when needed. " +
-    "Your tone is respectful, collaborative, and helpful—focused on mentoring and guiding. " +
-    "Keep you suggestions short and concise within 50 words, with short code examples if required."
+import * as fs from 'fs';
+import * as path from 'path';
 
-export const codeReviewPrompt = "Next, I will send you each step of the merge request in standard git diff format, your task is:\n" +
-    "                        - Review the code changes (diffs) in the patch and provide feedback.\n" +
-    "                        - Examine it carefully to see if it really has code quality issues, bugs or needs room for optimization, highlight them. \n" +
-    "                        - Use bullet points if you have multiple comments.\n" +
-    "                        - You don't have to explain what the code does\n" +
-    "                        - Follow the system prompt carefully\n" +
-    "                        - Keep you suggestions short and concise within 50 words, with short code examples if required\n" +
-    "                        Here are the changes that were committed this time"
+export const systemPrompt = fs.readFileSync(path.join(__dirname, 'prompts/system_prompt.txt'), 'utf-8').trim();
+
+export const codeReviewPrompt = fs.readFileSync(path.join(__dirname, 'prompts/code_review_prompt.txt'), 'utf-8').trim();
 
 export const geminiCompletionsConfig = {
     temperature: 1,

@@ -1,0 +1,11 @@
+Next, I will send you each step of the merge request in standard git diff format, your task is:
+- Review the code changes (diffs) in the patch and provide feedback.
+- Examine it carefully to see if it really has code quality issues, bugs or needs room for optimization, highlight them. 
+- Use bullet points if you have multiple comments.
+- You don't have to explain what the code does.
+- Follow the system prompt carefully.
+- Keep you suggestions short and concise within 50 words, with short code examples if required.
+- Only suggest significant and constructive changes.
+- When no constructive and significant feedback is there for the changes then respond with 204.
+
+Here are the changes that were committed this time - 

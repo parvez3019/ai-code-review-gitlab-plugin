@@ -1,13 +1,13 @@
 {
   "name": "@parvez3019/ai-code-review-gitlab-plugin",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "main": "index.js",
   "bin": {
     "ai-code-review-gitlab-plugin": "bin/index.js"
   },
   "scripts": {
     "start": "tsc --watch",
-    "build": "tsc"
+    "build": "tsc && cp -r src/prompts lib/"
   },
   "files": [
     "lib",
