@@ -6,25 +6,32 @@ Based on - https://github.com/hataiit9x/gemini-review-code
 
 ## Summary
 
-![](preview.png)
-
 `@parvez3019/ai-code-review-gitlab-plugin` It is a small tool used for code review in GitLab Merge Requests. It supports calling the GitLab API for private 
 deployment and uses either Gemini AI API or AWS Bedrock (Claude) to obtain review results. Please note that when using it, ensure compliance with company regulations. 😉
 
 
+
 ## Features
 
-- 🛠️ Support configuration GitLab API address
-- ⚙️ Support configuration AWS Bedrock (Claude) for code review
-- 📦 Support configuration AWS Bedrock custom model ID
-- 📦 Support configuration GitLab Project ID
-- 📦 Support configuration GitLab Merge Request ID
-- 🚀 Support running in CI/CD
-- 🚦 Automatically wait and try again when the rate limit is exceeded
-- 💬 The review results are appended to the location of the corresponding code block in the form of comments
-- 🔒 Secure handling of AWS credentials and GitLab tokens
-- 🌐 Support for AWS Bedrock Claude models
-- 🏷️ Easy integration with GitLab CI/CD pipelines
+- 🛠️ Support configuration GitLab API address.
+- ⚙️ Support configuration AWS Bedrock (Claude or any bedrock models) for code review.
+- 📦 Support configuration GitLab Project ID & Merge Request IID.
+- 🚀 Support running in Gitlab CI/CD Pipeline.
+- 🚦 Automatically wait and try again when the rate limit is exceeded.
+- 💬 The review results are appended to the location of the corresponding code block in the form of comments.
+- 🔒 Secure handling of AWS credentials and GitLab tokens.
+- 🏷️ Easy integration with GitLab CI/CD pipelines.
+- 📝 Provide Summary Sections for the changes where no feedback is required.
+
+
+### Screenshots for comments on Gitlab Merge Requests
+
+Review Comment -
+
+![](screenshots/screenshot-1.png)
+
+Summary Comment For No Feedback Section -
+![](screenshots/screenshot-2.png)
 
 
 ## Install
@@ -38,9 +45,9 @@ npm i @parvez3019/ai-code-review-gitlab-plugin
 ### AWS Bedrock Configuration
 ```bash
 # Required for AWS Bedrock
-export AWS_ACCESS_KEY_ID="your-aws-access-key"
-export AWS_SECRET_ACCESS_KEY="your-aws-secret-key"
 export AWS_REGION="us-east-1"
+export AWS_SECRET_ACCESS_KEY="your-aws-secret-key"
+export AWS_ACCESS_KEY_ID="your-aws-access-key"
 # Available Claude models in Bedrock:
 # - anthropic.claude-3-5-sonnet-20241022-v2:0
 export AWS_BEDROCK_MODEL="anthropic.claude-3-5-sonnet-20241022-v2:0"
@@ -87,7 +94,12 @@ code-review:
   image: node:20
   script:
     - npm i -g @parvez3019/ai-code-review-gitlab-plugin
-    - ai-code-review-gitlab-plugin -t "$CODE_REVIEW_GITLAB_TOKEN" -p "$CI_MERGE_REQUEST_PROJECT_ID" -m "$CI_MERGE_REQUEST_IID" -a bedrock -k "$AWS_ACCESS_KEY_ID" -s "$AWS_SECRET_ACCESS_KEY" -r "us-east-1" -c "anthropic.claude-3-5-sonnet-20241022-v2:0"
+    - |
+      if [ "$AI_PROVIDER" = "bedrock" ]; then
+        ai-code-review-gitlab-plugin -t "$CODE_REVIEW_GITLAB_TOKEN" -p "$CI_MERGE_REQUEST_PROJECT_ID" -m "$CI_MERGE_REQUEST_IID" -a $AI_PROVIDER -k "$AWS_ACCESS_KEY_ID" -s "$AWS_SECRET_ACCESS_KEY" -r "$AWS_REGION" -c "$AWS_BEDROCK_MODEL"
+      else
+        ai-code-review-gitlab-plugin -t "$CODE_REVIEW_GITLAB_TOKEN" -p "$CI_MERGE_REQUEST_PROJECT_ID" -m "$CI_MERGE_REQUEST_IID" -a $AI_PROVIDER -k "$GEMINI_API_KEY" -c "$GEMINI_MODEL"
+      fi
   only:
     - merge_requests
   when: manual
@@ -211,7 +223,7 @@ This can be integrated into your existing workflows or automation scripts.
 
 ## Requirements
 
-- Node.js >= 18.0.0
+- Node.js >= 20.0.0
 - GitLab account with API access
 - Google Cloud account (for Gemini) or AWS account (for Bedrock)
 
