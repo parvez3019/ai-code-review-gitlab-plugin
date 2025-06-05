@@ -1,8 +1,8 @@
 import axios, {AxiosInstance} from 'axios';
 import {
     geminiCompletionsConfig,
-    codeReviewPrompt,
-    systemPrompt,
+    getSystemPrompt,
+    getCodeReviewPrompt,
 } from "./utils";
 import { AICodeReviewClient, AIClientConfig } from "./ai-client";
 
@@ -30,6 +30,7 @@ export class Gemini implements AICodeReviewClient {
     private apiKey: string;
     private apiUrl: string;
     private model: string;
+    private config: AIClientConfig;
 
     constructor(config: AIClientConfig) {
         if (!config.apiKey) {
@@ -39,6 +40,7 @@ export class Gemini implements AICodeReviewClient {
         this.apiKey = config.apiKey;
         this.apiUrl = config.apiUrl || process.env.GEMINI_API_URL || "https://generativelanguage.googleapis.com";
         this.model = config.model || process.env.GEMINI_MODEL || geminiCompletionsConfig.model;
+        this.config = config;
 
         this.apiClient = axios.create({
             baseURL: this.apiUrl,
@@ -56,6 +58,12 @@ export class Gemini implements AICodeReviewClient {
             'User-Agent':
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36 Edg/91.0.864.41',
         }
+
+        const [systemPrompt, codeReviewPrompt] = await Promise.all([
+            this.config.systemPrompt || getSystemPrompt(),
+            this.config.codeReviewPrompt || getCodeReviewPrompt()
+        ]);
+
         const body = {
             contents: [
                 {

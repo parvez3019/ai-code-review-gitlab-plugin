@@ -3,7 +3,7 @@ import {GitLab} from './gitlab';
 import {Gemini} from './gemini';
 import {BedrockClient} from './bedrock';
 import {AICodeReviewClient, AIClientConfig} from './ai-client';
-import {delay, getDiffBlocks, getLineObj} from "./utils";
+import {delay, getDiffBlocks, getLineObj, getSystemPrompt, getCodeReviewPrompt} from "./utils";
 
 const program = new Command();
 
@@ -17,6 +17,11 @@ program
     .option('-s, --api-secret <string>', 'API Secret (AWS Secret Access Key for Bedrock)')
     .option('-r, --region <string>', 'AWS Region for Bedrock', 'us-east-1')
     .option('-c, --custom-model <string>', 'Custom Model ID')
+    .option('-sp, --system-prompt-path <string>', 'Path to custom system prompt file (local file or s3://bucket/key)')
+    .option('-crp, --code-review-prompt-path <string>', 'Path to custom code review prompt file (local file or s3://bucket/key)')
+    .option('--s3-region <string>', 'AWS Region for S3 (if using S3 paths)')
+    .option('--s3-access-key <string>', 'AWS Access Key ID for S3 (if using S3 paths)')
+    .option('--s3-secret-key <string>', 'AWS Secret Access Key for S3 (if using S3 paths)')
     .parse(process.argv);
 
 const GEMINI = 'gemini';
@@ -29,11 +34,21 @@ async function createAIClient(): Promise<AICodeReviewClient> {
         apiSecret,
         region,
         customModel,
+        systemPromptPath,
+        codeReviewPromptPath,
+        s3Region,
+        s3AccessKey,
+        s3SecretKey,
     } = program.opts();
 
     if (!apiKey) {
         throw new Error('API Key is required');
     }
+
+    // Set S3 environment variables if provided
+    if (s3Region) process.env.S3_REGION = s3Region;
+    if (s3AccessKey) process.env.S3_ACCESS_KEY = s3AccessKey;
+    if (s3SecretKey) process.env.S3_SECRET_KEY = s3SecretKey;
 
     const config: AIClientConfig = {
         apiKey: apiKey,
@@ -41,6 +56,17 @@ async function createAIClient(): Promise<AICodeReviewClient> {
         model: customModel,
         region: region,
     };
+
+    // Load prompts if custom paths are provided
+    if (systemPromptPath || codeReviewPromptPath) {
+        const [systemPrompt, codeReviewPrompt] = await Promise.all([
+            systemPromptPath ? getSystemPrompt(systemPromptPath) : undefined,
+            codeReviewPromptPath ? getCodeReviewPrompt(codeReviewPromptPath) : undefined
+        ]);
+
+        if (systemPrompt) config.systemPrompt = systemPrompt;
+        if (codeReviewPrompt) config.codeReviewPrompt = codeReviewPrompt;
+    }
 
     switch (aiProvider.toLowerCase()) {
         case GEMINI:

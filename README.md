@@ -21,11 +21,12 @@ Based on - https://github.com/hataiit9x/gemini-review-code
 - 🔒 Secure handling of AWS credentials and GitLab tokens.
 - 🏷️ Easy integration with GitLab CI/CD pipelines.
 - 📝 Provide Summary Sections for the changes where no feedback is required.
+- 📝 Customizable prompts via local files or S3
 
 
-### Screenshots for comments on Gitlab Merge Requests
+## Screenshots for comments on Gitlab Merge Requests
 
-Review Comment -
+Review Comment:
 
 ![](screenshots/screenshot-1.png)
 
@@ -80,7 +81,12 @@ ai-code-review-gitlab-plugin \
   --api-key "your-api-key" \
   --api-secret "your-api-secret" \  # required for bedrock
   --region "us-east-1" \  # for bedrock
-  --custom-model "model-id"  # optional
+  --custom-model "model-id" \  # optional
+  --system-prompt-path "/path/to/system-prompt.txt" \  # optional, local file or s3://bucket/key
+  --code-review-prompt-path "/path/to/code-review-prompt.txt" \  # optional, local file or s3://bucket/key
+  --s3-region "us-east-1" \  # optional, for S3 prompt paths
+  --s3-access-key "your-s3-access-key" \  # optional, for S3 prompt paths
+  --s3-secret-key "your-s3-secret-key"  # optional, for S3 prompt paths
 ```
 
 ### GitLab CI/CD Integration
@@ -95,9 +101,33 @@ code-review:
     - npm i -g @parvez3019/ai-code-review-gitlab-plugin
     - |
       if [ "$AI_PROVIDER" = "bedrock" ]; then
-        ai-code-review-gitlab-plugin -t "$CODE_REVIEW_GITLAB_TOKEN" -p "$CI_MERGE_REQUEST_PROJECT_ID" -m "$CI_MERGE_REQUEST_IID" -a $AI_PROVIDER -k "$AWS_ACCESS_KEY_ID" -s "$AWS_SECRET_ACCESS_KEY" -r "$AWS_REGION" -c "$AWS_BEDROCK_MODEL"
+        ai-code-review-gitlab-plugin \
+          -t "$CODE_REVIEW_GITLAB_TOKEN" \
+          -p "$CI_MERGE_REQUEST_PROJECT_ID" \
+          -m "$CI_MERGE_REQUEST_IID" \
+          -a $AI_PROVIDER \
+          -k "$AWS_ACCESS_KEY_ID" \
+          -s "$AWS_SECRET_ACCESS_KEY" \
+          -r "$AWS_REGION" \
+          -c "$AWS_BEDROCK_MODEL" \
+          -sp "$SYSTEM_PROMPT_PATH" \
+          -crp "$CODE_REVIEW_PROMPT_PATH" \
+          --s3-region "$S3_REGION" \
+          --s3-access-key "$S3_ACCESS_KEY" \
+          --s3-secret-key "$S3_SECRET_KEY"
       else
-        ai-code-review-gitlab-plugin -t "$CODE_REVIEW_GITLAB_TOKEN" -p "$CI_MERGE_REQUEST_PROJECT_ID" -m "$CI_MERGE_REQUEST_IID" -a $AI_PROVIDER -k "$GEMINI_API_KEY" -c "$GEMINI_MODEL"
+        ai-code-review-gitlab-plugin \
+          -t "$CODE_REVIEW_GITLAB_TOKEN" \
+          -p "$CI_MERGE_REQUEST_PROJECT_ID" \
+          -m "$CI_MERGE_REQUEST_IID" \
+          -a $AI_PROVIDER \
+          -k "$GEMINI_API_KEY" \
+          -c "$GEMINI_MODEL" \
+          -sp "$SYSTEM_PROMPT_PATH" \
+          -crp "$CODE_REVIEW_PROMPT_PATH" \
+          --s3-region "$S3_REGION" \
+          --s3-access-key "$S3_ACCESS_KEY" \
+          --s3-secret-key "$S3_SECRET_KEY"
       fi
   only:
     - merge_requests
@@ -190,6 +220,11 @@ This can be integrated into your existing workflows or automation scripts.
 | `-s, --api-secret` | API Secret (AWS Secret Access Key for Bedrock) | - | Yes (for bedrock) |
 | `-r, --region` | AWS Region for Bedrock | us-east-1 | No |
 | `-c, --custom-model` | Custom Model ID | - | No |
+| `-sp, --system-prompt-path` | System Prompt Path | - | No |
+| `-crp, --code-review-prompt-path` | Code Review Prompt Path | - | No |
+| `-sr, --s3-region` | S3 Region | - | No |
+| `-sk, --s3-access-key` | S3 Access Key | - | No |
+| `-ssk, --s3-secret-key` | S3 Secret Key | - | No |
 
 ## Troubleshooting
 

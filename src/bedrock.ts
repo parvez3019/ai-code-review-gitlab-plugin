@@ -1,6 +1,6 @@
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
 import { AICodeReviewClient, AIClientConfig } from "./ai-client";
-import { systemPrompt, codeReviewPrompt } from "./utils";
+import { getSystemPrompt, getCodeReviewPrompt } from "./utils";
 
 // Types for Bedrock response
 interface BedrockResponse {
@@ -21,12 +21,14 @@ export class BedrockClient implements AICodeReviewClient {
     private model: string;
     private readonly maxRetries = 3;
     private readonly retryDelay = 1000; // 1 second
+    private config: AIClientConfig;
 
     constructor(config: AIClientConfig) {
         if (!config.apiKey || !config.apiSecret) {
             throw new Error("AWS credentials (apiKey and apiSecret) are required for Bedrock client");
         }
 
+        this.config = config;
         this.client = new BedrockRuntimeClient({
             region: process.env.AWS_REGION || config.region || "us-east-1",
             credentials: {
@@ -69,6 +71,11 @@ export class BedrockClient implements AICodeReviewClient {
         if (!change?.trim()) {
             throw new Error("Code change cannot be empty");
         }
+
+        const [systemPrompt, codeReviewPrompt] = await Promise.all([
+            this.config.systemPrompt || getSystemPrompt(),
+            this.config.codeReviewPrompt || getCodeReviewPrompt()
+        ]);
 
         const prompt = `${systemPrompt}\n\n${codeReviewPrompt}\n\n${change}`;
 

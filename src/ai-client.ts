@@ -8,4 +8,6 @@ export interface AIClientConfig {
     apiUrl?: string;     // Optional, used by Gemini client
     model?: string;
     region?: string;
+    systemPrompt?: string;
+    codeReviewPrompt?: string;
 } 
