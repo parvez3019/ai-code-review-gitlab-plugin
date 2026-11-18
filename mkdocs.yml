@@ -7,6 +7,7 @@ edit_uri: edit/main/docs/
 
 theme:
   name: material
+  custom_dir: overrides
   features:
     - navigation.sections
     - navigation.top
@@ -56,6 +57,8 @@ markdown_extensions:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 extra:
+  # Google Search Console: paste the content="..." value of the HTML-tag verification here
+  google_site_verification: ""
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/parvez3019/ai-code-review-gitlab-plugin
