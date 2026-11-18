@@ -1,0 +1,8 @@
+node_modules
+lib
+site
+docs
+screenshots
+.git
+.github
+*.tgz

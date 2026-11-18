@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://parvez3019.github.io/ai-code-review-gitlab-plugin/
+    about: Setup guides, provider configuration and troubleshooting
+  - name: Questions & ideas (Discussions)
+    url: https://github.com/parvez3019/ai-code-review-gitlab-plugin/discussions
+    about: Ask a question or share how you use the tool

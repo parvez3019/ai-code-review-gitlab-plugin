@@ -1,270 +1,91 @@
-# @parvez3019/ai-code-review-gitlab-plugin
+# AI Code Review for GitLab
 
-Based on - https://github.com/hataiit9x/gemini-review-code
+**Inline AI code review on every GitLab merge request, using your own model and your own keys.**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![npm version](https://img.shields.io/npm/v/@parvez3019/ai-code-review-gitlab-plugin.svg)](https://www.npmjs.com/package/@parvez3019/ai-code-review-gitlab-plugin)
+[![npm downloads](https://img.shields.io/npm/dm/@parvez3019/ai-code-review-gitlab-plugin.svg)](https://www.npmjs.com/package/@parvez3019/ai-code-review-gitlab-plugin)
+[![CI](https://github.com/parvez3019/ai-code-review-gitlab-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/parvez3019/ai-code-review-gitlab-plugin/actions/workflows/ci.yml)
+[![GitHub stars](https://img.shields.io/github/stars/parvez3019/ai-code-review-gitlab-plugin?style=social)](https://github.com/parvez3019/ai-code-review-gitlab-plugin)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Summary
+📖 **Docs:** https://parvez3019.github.io/ai-code-review-gitlab-plugin/
 
-`@parvez3019/ai-code-review-gitlab-plugin` It is a small tool used for inline code review in GitLab Merge Requests. It supports calling the GitLab API for adding inline review comments and uses either Gemini AI API or AWS Bedrock to obtain AI code review feedbacks. Please note that when using it, ensure compliance with company regulations. 😉
+A small, auditable CLI that reads a merge request diff, asks an LLM to review each hunk, and posts the feedback as **inline discussion threads** on the exact lines that changed. It runs in your GitLab runners and talks only to the provider you choose.
 
-
+![Inline AI review comment on a GitLab merge request](screenshots/screenshot-1.png)
 
 ## Features
 
-- 🛠️ Support configuration GitLab API address.
-- ⚙️ Support configuration AWS Bedrock (Claude or any bedrock models) for code review.
-- 📦 Support configuration GitLab Project ID & Merge Request IID.
-- 🚀 Support running in Gitlab CI/CD Pipeline.
-- 🚦 Automatically wait and try again when the rate limit is exceeded.
-- 💬 The review results are appended to the location of the corresponding code block in the form of comments.
-- 🔒 Secure handling of AWS credentials and GitLab tokens.
-- 🏷️ Easy integration with GitLab CI/CD pipelines.
-- 📝 Provide Summary Sections for the changes where no feedback is required.
-- 📝 Customizable prompts via local files or S3
+- 💬 **Inline comments** on the changed line, plus one summary note for hunks that need no feedback
+- 🔑 **Bring your own model**: Claude on **AWS Bedrock** or the **Anthropic API**, **Google Gemini**, or any **OpenAI-compatible** endpoint (OpenAI, **Ollama**, vLLM, LiteLLM, OpenRouter…)
+- 🔒 **Your code stays in your cloud**: no SaaS in the middle; fully air-gapped with Ollama
+- ⚡ **Zero-flag GitLab CI setup**: reads `CI_MERGE_REQUEST_IID`, `CI_MERGE_REQUEST_PROJECT_ID`, `CI_API_V4_URL` automatically
+- 🧩 Ships as an **npm package**, a **Docker image** and a **GitLab CI/CD Catalog component**
+- 📝 **Custom prompts** from a repo file or S3, so you can enforce your own review checklist
+- 🚦 Automatic retry on rate limits; works with gitlab.com and self-managed GitLab
 
+## Quick start (60 seconds)
 
-## Screenshots for comments on Gitlab Merge Requests
-
-Review Comment:
-
-![](screenshots/screenshot-1.png)
-
-Summary Comment For No Feedback Section -
-![](screenshots/screenshot-2.png)
-
-
-## Install
-
-```sh
-npm i @parvez3019/ai-code-review-gitlab-plugin
-```
-
-## Environment Variables
-
-### AWS Bedrock Configuration
-```bash
-# Required for AWS Bedrock
-export AWS_REGION="us-east-1"
-export AWS_SECRET_ACCESS_KEY="your-aws-secret-key"
-export AWS_ACCESS_KEY_ID="your-aws-access-key"
-# Available Claude models in Bedrock:
-# - anthropic.claude-3-5-sonnet-20241022-v2:0
-export AWS_BEDROCK_MODEL="anthropic.claude-3-5-sonnet-20241022-v2:0"
-```
-
-### Gemini Configuration
-```bash
-# Required for Gemini
-export GEMINI_API_KEY="your-gemini-api-key"
-export GEMINI_API_URL="https://generativelanguage.googleapis.com"
-export GEMINI_MODEL="gemini-1.5-flash"
-```
-
-### General Configuration
-```bash
-# Optional: Set default AI provider
-export AI_PROVIDER="bedrock"  # or "gemini"
-```
-
-## Usage
-
-### Command Line Arguments
-
-```bash
-ai-code-review-gitlab-plugin \
-  --gitlab-api-url "https://gitlab.com/api/v4" \
-  --gitlab-access-token "your-gitlab-token" \
-  --project-id 123 \
-  --merge-request-id 456 \
-  --ai-provider bedrock \  # or gemini
-  --api-key "your-api-key" \
-  --api-secret "your-api-secret" \  # required for bedrock
-  --region "us-east-1" \  # for bedrock
-  --custom-model "model-id" \  # optional
-  --system-prompt-path "/path/to/system-prompt.txt" \  # optional, local file or s3://bucket/key
-  --code-review-prompt-path "/path/to/code-review-prompt.txt" \  # optional, local file or s3://bucket/key
-  --s3-region "us-east-1" \  # optional, for S3 prompt paths
-  --s3-access-key "your-s3-access-key" \  # optional, for S3 prompt paths
-  --s3-secret-key "your-s3-secret-key"  # optional, for S3 prompt paths
-```
-
-### GitLab CI/CD Integration
-
-Add the following to your `.gitlab-ci.yml` file to enable automated code reviews:
+1. Add a project access token with the `api` scope as a masked CI/CD variable called **`CODE_REVIEW_GITLAB_TOKEN`**.
+2. Add your provider key as a masked CI/CD variable, for example **`GEMINI_API_KEY`**, **`ANTHROPIC_API_KEY`**, or `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY` for Bedrock.
+3. Add this job to `.gitlab-ci.yml`:
 
 ```yaml
-code-review:
-  stage: code-review
+ai-code-review:
   image: node:20
+  variables:
+    AI_PROVIDER: gemini        # or: anthropic | bedrock | openai
   script:
-    - npm i -g @parvez3019/ai-code-review-gitlab-plugin
-    - |
-      if [ "$AI_PROVIDER" = "bedrock" ]; then
-        ai-code-review-gitlab-plugin \
-          -t "$CODE_REVIEW_GITLAB_TOKEN" \
-          -p "$CI_MERGE_REQUEST_PROJECT_ID" \
-          -m "$CI_MERGE_REQUEST_IID" \
-          -a $AI_PROVIDER \
-          -k "$AWS_ACCESS_KEY_ID" \
-          -s "$AWS_SECRET_ACCESS_KEY" \
-          -r "$AWS_REGION" \
-          -c "$AWS_BEDROCK_MODEL" \
-          -sp "$SYSTEM_PROMPT_PATH" \
-          -crp "$CODE_REVIEW_PROMPT_PATH" \
-          --s3-region "$S3_REGION" \
-          --s3-access-key "$S3_ACCESS_KEY" \
-          --s3-secret-key "$S3_SECRET_KEY"
-      else
-        ai-code-review-gitlab-plugin \
-          -t "$CODE_REVIEW_GITLAB_TOKEN" \
-          -p "$CI_MERGE_REQUEST_PROJECT_ID" \
-          -m "$CI_MERGE_REQUEST_IID" \
-          -a $AI_PROVIDER \
-          -k "$GEMINI_API_KEY" \
-          -c "$GEMINI_MODEL" \
-          -sp "$SYSTEM_PROMPT_PATH" \
-          -crp "$CODE_REVIEW_PROMPT_PATH" \
-          --s3-region "$S3_REGION" \
-          --s3-access-key "$S3_ACCESS_KEY" \
-          --s3-secret-key "$S3_SECRET_KEY"
-      fi
-  only:
-    - merge_requests
-  when: manual
-  tags:
-    - build
-    - stg
+    - npx -y @parvez3019/ai-code-review-gitlab-plugin
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 ```
 
-### Alternative Trigger Methods
+Or include the CI/CD component:
 
-#### 1. Using GitLab Webhooks
-
-You can set up automatic code reviews when you are added as a reviewer using GitLab Webhooks:
-
-1. Go to your GitLab project settings
-2. Navigate to Webhooks
-3. Add a new webhook with the following settings:
-   - URL: Your webhook endpoint (e.g., AWS Lambda function URL)
-   - Trigger: Select "Merge request events"
-   - Secret token: Generate a secure token
-
-4. Create a webhook handler (example using AWS Lambda):
-
-```javascript
-exports.handler = async (event) => {
-    const payload = JSON.parse(event.body);
-    
-    // Check if this is a merge request event
-    if (payload.object_kind === 'merge_request') {
-        // Check if the action is adding a reviewer
-        if (payload.action === 'reviewer') {
-            // Check if you are the added reviewer
-            const yourGitlabId = 'YOUR_GITLAB_USER_ID';
-            const addedReviewers = payload.changes.reviewers?.current || [];
-            
-            if (addedReviewers.some(reviewer => reviewer.id === yourGitlabId)) {
-                // Trigger the code review
-                const response = await fetch('https://gitlab.com/api/v4/projects/' + 
-                    payload.project.id + '/merge_requests/' + 
-                    payload.object_attributes.iid + '/pipeline', {
-                    method: 'POST',
-                    headers: {
-                        'PRIVATE-TOKEN': process.env.GITLAB_TOKEN
-                    }
-                });
-            }
-        }
-    }
-    
-    return {
-        statusCode: 200,
-        body: JSON.stringify('Webhook processed')
-    };
-};
+```yaml
+include:
+  - component: gitlab.com/parvez3019/ai-code-review-gitlab-plugin/ai-code-review@~latest
+    inputs:
+      provider: anthropic
 ```
 
-This setup will:
-1. Listen for merge request events
-2. Check if you are added as a reviewer
-3. Automatically trigger the code review pipeline when you are added
+Open a merge request, and the review comments show up on the diff.
 
-Make sure to:
-- Replace `YOUR_GITLAB_USER_ID` with your actual GitLab user ID
-- Set up the necessary environment variables in your webhook handler
-- Configure proper security measures for your webhook endpoint
+## Providers
 
-#### 2. Using GitLab API Directly
+| Provider | `AI_PROVIDER` | Credentials | Default model |
+|---|---|---|---|
+| [AWS Bedrock (Claude)](https://parvez3019.github.io/ai-code-review-gitlab-plugin/providers/bedrock/) | `bedrock` | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` | `us.anthropic.claude-sonnet-5` |
+| [Anthropic API](https://parvez3019.github.io/ai-code-review-gitlab-plugin/providers/anthropic/) | `anthropic` | `ANTHROPIC_API_KEY` | `claude-sonnet-5-5` |
+| [Google Gemini](https://parvez3019.github.io/ai-code-review-gitlab-plugin/providers/gemini/) | `gemini` | `GEMINI_API_KEY` | `gemini-3.5-flash` |
+| [OpenAI-compatible / Ollama](https://parvez3019.github.io/ai-code-review-gitlab-plugin/providers/openai-compatible/) | `openai` | `OPENAI_API_KEY` (optional), `OPENAI_BASE_URL` | set `AI_MODEL` |
 
-You can also trigger the code review directly using the GitLab API:
+Override the model with `AI_MODEL` or `--custom-model`.
 
-```bash
-curl --request POST \
-  --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
-  "https://gitlab.com/api/v4/projects/$PROJECT_ID/merge_requests/$MR_IID/pipeline"
-```
+## Why this instead of GitLab Duo, CodeRabbit or PR-Agent?
 
-This can be integrated into your existing workflows or automation scripts.
+- **Small and auditable**: under 1,000 lines of TypeScript that a security team can read in one sitting
+- **CI-native**: one job, with no webhook server and no SaaS app to approve
+- **AWS-friendly**: reviews go through Bedrock in your own account
+- **Free (MIT)**: you only pay for the tokens you use
 
-### Options
+There's a fuller, honest [comparison in the docs](https://parvez3019.github.io/ai-code-review-gitlab-plugin/comparison/).
 
-| Option | Description | Default | Required |
-|--------|-------------|---------|----------|
-| `-g, --gitlab-api-url` | GitLab API URL | https://gitlab.com/api/v4 | No |
-| `-t, --gitlab-access-token` | GitLab Access Token | - | Yes |
-| `-p, --project-id` | GitLab Project ID | - | Yes |
-| `-m, --merge-request-id` | GitLab Merge Request ID | - | Yes |
-| `-a, --ai-provider` | AI Provider (gemini or bedrock) | gemini | No |
-| `-k, --api-key` | API Key (Gemini API Key or AWS Access Key ID) | - | Yes |
-| `-s, --api-secret` | API Secret (AWS Secret Access Key for Bedrock) | - | Yes (for bedrock) |
-| `-r, --region` | AWS Region for Bedrock | us-east-1 | No |
-| `-c, --custom-model` | Custom Model ID | - | No |
-| `-sp, --system-prompt-path` | System Prompt Path | - | No |
-| `-crp, --code-review-prompt-path` | Code Review Prompt Path | - | No |
-| `-sr, --s3-region` | S3 Region | - | No |
-| `-sk, --s3-access-key` | S3 Access Key | - | No |
-| `-ssk, --s3-secret-key` | S3 Secret Key | - | No |
+## Documentation
 
-## Troubleshooting
-
-### AWS Bedrock Issues
-
-1. **Model Not Available Error**
-   - Make sure you're using a supported model ID
-   - Check if you have access to the model in your AWS region
-   - Verify that your AWS account has the necessary permissions
-
-2. **Authentication Errors**
-   - Verify your AWS credentials are correct
-   - Check if your AWS credentials have the necessary permissions for Bedrock
-   - Ensure your AWS region is correct
-
-3. **Rate Limiting**
-   - The tool will automatically retry when rate limited
-   - Consider using a different model if you're consistently hitting rate limits
-
-### Gemini Issues
-
-1. **API Key Issues**
-   - Verify your Gemini API key is correct
-   - Check if your API key has the necessary permissions
-   - Ensure you're using the correct API URL
-
-2. **Model Availability**
-   - Make sure you're using a supported model ID
-   - Check if your API key has access to the specified model
-
-## Requirements
-
-- Node.js >= 20.0.0
-- GitLab account with API access
-- Google Cloud account (for Gemini) or AWS account (for Bedrock)
+- [GitLab CI setup](https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/gitlab-ci/) · [CI/CD component](https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/ci-catalog/) · [Docker](https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/docker/) · [CLI](https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/cli/)
+- [All options](https://parvez3019.github.io/ai-code-review-gitlab-plugin/configuration/options/) · [Environment variables](https://parvez3019.github.io/ai-code-review-gitlab-plugin/configuration/env-vars/) · [Custom prompts](https://parvez3019.github.io/ai-code-review-gitlab-plugin/configuration/custom-prompts/)
+- [Webhook trigger](https://parvez3019.github.io/ai-code-review-gitlab-plugin/guides/webhook-trigger/) · [Self-managed GitLab](https://parvez3019.github.io/ai-code-review-gitlab-plugin/guides/self-hosted-gitlab/) · [Troubleshooting](https://parvez3019.github.io/ai-code-review-gitlab-plugin/troubleshooting/)
 
 ## Contributing
 
-Welcome to contribute code, ask questions and suggestions! 👏
+Issues, ideas and PRs are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md). If this saves you review time, a ⭐ helps others find it.
+
+## Acknowledgements
+
+Originally based on [hataiit9x/gemini-review-code](https://github.com/hataiit9x/gemini-review-code).
 
 ## License
 
-This project is based on the MIT license. See the LICENSE file for details. 📜
+[MIT](LICENSE)

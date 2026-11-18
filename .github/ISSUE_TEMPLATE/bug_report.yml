@@ -1,0 +1,29 @@
+name: Bug report
+description: Something isn't working
+labels: [bug]
+body:
+  - type: input
+    attributes:
+      label: Version
+      description: Output of `npm ls -g @parvez3019/ai-code-review-gitlab-plugin` or the image tag
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: AI provider
+      options: [gemini, bedrock, anthropic, openai / ollama]
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: GitLab
+      options: [gitlab.com, self-managed]
+  - type: textarea
+    attributes:
+      label: What happened?
+      description: Include the job log with secrets removed.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What did you expect?

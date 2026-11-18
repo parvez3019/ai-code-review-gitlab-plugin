@@ -100,7 +100,7 @@ export const geminiCompletionsConfig = {
     topK: 64,
     maxOutputTokens: 8192,
     responseMimeType: "text/plain",
-    model: "gemini-1.5-flash",
+    model: "gemini-3.5-flash",
 }
 
 export const delay = (time: number) => {
