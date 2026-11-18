@@ -28,7 +28,8 @@ program
     .option('--s3-region <string>', 'AWS Region for S3 (if using S3 paths)')
     .option('--s3-access-key <string>', 'AWS Access Key ID for S3 (if using S3 paths)')
     .option('--s3-secret-key <string>', 'AWS Secret Access Key for S3 (if using S3 paths)')
-    .option('--no-attribution', 'Do not add the "Reviewed by" footer to the summary comment');
+    .option('--no-attribution', 'Do not add the "Reviewed by" footer to the summary comment')
+    .option('--max-hunks <number>', 'Review at most this many diff hunks and post a note about the rest (default: $AI_REVIEW_MAX_HUNKS, unlimited)');
 
 const ATTRIBUTION_FOOTER =
     '\n\n---\n<sub>🤖 Reviewed by [ai-code-review-gitlab-plugin](https://github.com/parvez3019/ai-code-review-gitlab-plugin)</sub>';
@@ -108,6 +109,8 @@ async function run(argv: string[] = process.argv) {
     }
 
     const noFeedbackLogs: Array<{file: string, line: any, code: string}> = [];
+    let reviewedHunks = 0;
+    let skippedHunks = 0;
 
     for (const change of changes) {
         if (change.renamed_file || change.deleted_file || !change?.diff?.startsWith('@@')) {
@@ -121,6 +124,11 @@ async function run(argv: string[] = process.argv) {
             if (matches) {
                 const lineObj = getLineObj(matches, item);
                 if ((lineObj?.new_line && lineObj?.new_line > 0) || (lineObj.old_line && lineObj.old_line > 0)) {
+                    if (cfg.maxHunks !== undefined && reviewedHunks >= cfg.maxHunks) {
+                        skippedHunks++;
+                        continue;
+                    }
+                    reviewedHunks++;
                     try {
                         const suggestion = await aiClient.reviewCodeChange(item);
                         if (suggestion.trim() === NO_REVIEW_CONTENT_PLACEHOLDER) {
@@ -142,6 +150,7 @@ async function run(argv: string[] = process.argv) {
                     } catch (e: any) {
                         if (e?.response?.status === 429) {
                             console.log('Too Many Requests, try again');
+                            reviewedHunks--; // the retry is counted again when it is re-queued
                             await delay(60 * 1000);
                             diffBlocks.push(item);
                         } else {
@@ -160,6 +169,15 @@ async function run(argv: string[] = process.argv) {
         ).join('\n')}${cfg.attribution ? ATTRIBUTION_FOOTER : ''}`;
 
         await gitlab.addComment(summaryMessage);
+    }
+
+    if (skippedHunks > 0) {
+        console.log(`Review limit reached: ${skippedHunks} hunk(s) skipped (--max-hunks ${cfg.maxHunks})`);
+        await gitlab.addComment(
+            `### Review Limit Reached
+
+Only the first ${cfg.maxHunks} diff hunks were reviewed; ${skippedHunks} more ${skippedHunks === 1 ? 'hunk was' : 'hunks were'} skipped because of the configured \`--max-hunks\` limit.${cfg.attribution ? ATTRIBUTION_FOOTER : ''}`
+        );
     }
 
     console.log('done');

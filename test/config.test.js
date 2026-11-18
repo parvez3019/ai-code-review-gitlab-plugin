@@ -70,3 +70,18 @@ test('attribution can be disabled by flag or env var', () => {
     assert.strictEqual(resolveConfig({attribution: false}, env).attribution, false);
     assert.strictEqual(resolveConfig({}, {...env, AI_REVIEW_ATTRIBUTION: 'false'}).attribution, false);
 });
+
+test('max hunks is unlimited by default and read from flag or AI_REVIEW_MAX_HUNKS', () => {
+    const env = {...ciEnv, GEMINI_API_KEY: 'g'};
+    assert.strictEqual(resolveConfig({}, env).maxHunks, undefined);
+    assert.strictEqual(resolveConfig({maxHunks: '5'}, env).maxHunks, 5);
+    assert.strictEqual(resolveConfig({}, {...env, AI_REVIEW_MAX_HUNKS: '20'}).maxHunks, 20);
+    assert.strictEqual(resolveConfig({maxHunks: '3'}, {...env, AI_REVIEW_MAX_HUNKS: '20'}).maxHunks, 3);
+});
+
+test('max hunks must be a positive integer', () => {
+    const env = {...ciEnv, GEMINI_API_KEY: 'g'};
+    for (const bad of ['0', '-1', 'abc', '1.5']) {
+        assert.throws(() => resolveConfig({maxHunks: bad}, env), /max-hunks/);
+    }
+});

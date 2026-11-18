@@ -38,3 +38,4 @@ description: Environment variables read by ai-code-review-gitlab-plugin, includi
 | `CODE_REVIEW_PROMPT_PATH` | Custom review prompt (file or `s3://`) |
 | `S3_REGION`, `S3_ACCESS_KEY`, `S3_SECRET_KEY` | Credentials for S3 prompt files |
 | `AI_REVIEW_ATTRIBUTION` | Set to `false` to remove the summary footer |
+| `AI_REVIEW_MAX_HUNKS` | Maximum number of diff hunks to review (positive integer) |
