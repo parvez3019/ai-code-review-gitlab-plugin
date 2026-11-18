@@ -57,6 +57,26 @@
     
     
     
+  
+  
+
+  
+  
+  
+  
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="AI Code Review for GitLab">
+  <meta property="og:title" content="Self-managed GitLab - AI Code Review for GitLab">
+  <meta property="og:description" content="Run AI code review on a self-managed GitLab instance.">
+  <meta property="og:url" content="https://parvez3019.github.io/ai-code-review-gitlab-plugin/guides/self-hosted-gitlab/">
+  <meta property="og:image" content="https://parvez3019.github.io/ai-code-review-gitlab-plugin/assets/social-preview.png">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Self-managed GitLab - AI Code Review for GitLab">
+  <meta name="twitter:description" content="Run AI code review on a self-managed GitLab instance.">
+  <meta name="twitter:image" content="https://parvez3019.github.io/ai-code-review-gitlab-plugin/assets/social-preview.png">
+
   </head>
   
   
@@ -348,12 +368,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../getting-started/ci-catalog/" class="md-nav__link">
+      <a href="../../getting-started/ci-template/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    CI/CD Catalog component
+    One-line CI template
     
   </span>
   
@@ -966,7 +986,7 @@
 <ul>
 <li>In CI, the API URL is taken from <code>CI_API_V4_URL</code>, so no configuration is needed.</li>
 <li>Outside CI, pass <code>--gitlab-api-url https://gitlab.your-company.com/api/v4</code>.</li>
-<li>For the CI/CD component, mirror this project into your instance or copy <code>templates/ai-code-review.yml</code> (see <a href="../../getting-started/ci-catalog/#self-managed-gitlab">CI/CD Catalog</a>).</li>
+<li>The <a href="../../getting-started/ci-template/">reusable CI template</a> works on self-managed GitLab too. If runners can't reach GitHub, copy it in and use <code>include: local</code>.</li>
 <li>For air-gapped environments, pair it with <a href="../../providers/openai-compatible/">Ollama or another self-hosted model</a> and the <a href="../../getting-started/docker/">Docker image</a> mirrored into your registry.</li>
 </ul>
 

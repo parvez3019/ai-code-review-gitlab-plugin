@@ -6,11 +6,11 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Include the AI code review GitLab CI/CD Catalog component with one include line.">
+        <meta name="description" content="Add AI code review to GitLab CI with a single include line, using the reusable CI template with inputs.">
       
       
       
-        <link rel="canonical" href="https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/ci-catalog/">
+        <link rel="canonical" href="https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/ci-template/">
       
       
         <link rel="prev" href="../gitlab-ci/">
@@ -24,7 +24,7 @@
     
     
       
-        <title>CI/CD Catalog component - AI Code Review for GitLab</title>
+        <title>One-line CI template - AI Code Review for GitLab</title>
       
     
     
@@ -57,6 +57,26 @@
     
     
     
+  
+  
+
+  
+  
+  
+  
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="AI Code Review for GitLab">
+  <meta property="og:title" content="One-line CI template - AI Code Review for GitLab">
+  <meta property="og:description" content="Add AI code review to GitLab CI with a single include line, using the reusable CI template with inputs.">
+  <meta property="og:url" content="https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/ci-template/">
+  <meta property="og:image" content="https://parvez3019.github.io/ai-code-review-gitlab-plugin/assets/social-preview.png">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="One-line CI template - AI Code Review for GitLab">
+  <meta name="twitter:description" content="Add AI code review to GitLab CI with a single include line, using the reusable CI template with inputs.">
+  <meta name="twitter:image" content="https://parvez3019.github.io/ai-code-review-gitlab-plugin/assets/social-preview.png">
+
   </head>
   
   
@@ -76,7 +96,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#cicd-catalog-component" class="md-skip">
+        <a href="#reusable-ci-template-one-line-include" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +132,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              CI/CD Catalog component
+              One-line CI template
             
           </span>
         </div>
@@ -364,7 +384,7 @@
   
   
   <span class="md-ellipsis">
-    CI/CD Catalog component
+    One-line CI template
     
   </span>
   
@@ -377,7 +397,7 @@
   
   
   <span class="md-ellipsis">
-    CI/CD Catalog component
+    One-line CI template
     
   </span>
   
@@ -409,9 +429,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#self-managed-gitlab" class="md-nav__link">
+  <a href="#overriding-the-job" class="md-nav__link">
     <span class="md-ellipsis">
-      Self-managed GitLab
+      Overriding the job
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#runners-without-internet-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      Runners without internet access
     </span>
   </a>
   
@@ -1005,9 +1034,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#self-managed-gitlab" class="md-nav__link">
+  <a href="#overriding-the-job" class="md-nav__link">
     <span class="md-ellipsis">
-      Self-managed GitLab
+      Overriding the job
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#runners-without-internet-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      Runners without internet access
     </span>
   </a>
   
@@ -1029,7 +1067,7 @@
 
 
   
-    <a href="https://github.com/parvez3019/ai-code-review-gitlab-plugin/edit/main/docs/getting-started/ci-catalog.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/parvez3019/ai-code-review-gitlab-plugin/edit/main/docs/getting-started/ci-template.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1037,14 +1075,18 @@
   
 
 
-<h1 id="cicd-catalog-component">CI/CD Catalog component<a class="headerlink" href="#cicd-catalog-component" title="Permanent link">&para;</a></h1>
-<p>The project ships a <a href="https://docs.gitlab.com/ci/components/">GitLab CI/CD component</a> so you can add AI review with a single <code>include</code>.</p>
+<h1 id="reusable-ci-template-one-line-include">Reusable CI template (one-line include)<a class="headerlink" href="#reusable-ci-template-one-line-include" title="Permanent link">&para;</a></h1>
+<p>The repository ships a reusable GitLab CI template with <a href="https://docs.gitlab.com/ci/inputs/">inputs</a>, <code>templates/ai-code-review.yml</code>. Include it straight from GitHub and pin a release tag:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">include</span><span class="p">:</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">component</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gitlab.com/parvez3019/ai-code-review-gitlab-plugin/ai-code-review@~latest</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">remote</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://raw.githubusercontent.com/parvez3019/ai-code-review-gitlab-plugin/0.1.0/templates/ai-code-review.yml</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">      </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">anthropic</span>
 </code></pre></div>
-<p>Credentials still come from your CI/CD variables (see <a href="../gitlab-ci/#2-add-provider-credentials">GitLab CI setup</a>).</p>
+<p>This adds an <code>ai-code-review</code> job that runs in merge request pipelines and uses the prebuilt <a href="../docker/">Docker image</a>. Credentials still come from your CI/CD variables (see <a href="../gitlab-ci/#2-add-provider-credentials">GitLab CI setup</a>).</p>
+<div class="admonition tip">
+<p class="admonition-title">Pin a tag</p>
+<p>Always include a release tag (for example <code>0.1.0</code>), not <code>main</code>, so the job only changes when you choose to upgrade.</p>
+</div>
 <h2 id="inputs">Inputs<a class="headerlink" href="#inputs" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1087,8 +1129,15 @@
 </tr>
 </tbody>
 </table>
-<h2 id="self-managed-gitlab">Self-managed GitLab<a class="headerlink" href="#self-managed-gitlab" title="Permanent link">&para;</a></h2>
-<p>Components on gitlab.com can't be included from a self-managed instance. Either mirror the project into your instance and include it from there, or copy <a href="https://github.com/parvez3019/ai-code-review-gitlab-plugin/blob/main/templates/ai-code-review.yml"><code>templates/ai-code-review.yml</code></a> into your own repository and use <code>include: local</code>.</p>
+<h2 id="overriding-the-job">Overriding the job<a class="headerlink" href="#overriding-the-job" title="Permanent link">&para;</a></h2>
+<p>Anything not covered by inputs can be overridden by redefining keys on the <code>ai-code-review</code> job after the include:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">ai-code-review</span><span class="p">:</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">docker</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="nt">SYSTEM_PROMPT_PATH</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.gitlab/ai-review/system_prompt.txt</span>
+</code></pre></div>
+<h2 id="runners-without-internet-access">Runners without internet access<a class="headerlink" href="#runners-without-internet-access" title="Permanent link">&para;</a></h2>
+<p>If your runners can't reach <code>raw.githubusercontent.com</code>, copy <a href="https://github.com/parvez3019/ai-code-review-gitlab-plugin/blob/main/templates/ai-code-review.yml"><code>templates/ai-code-review.yml</code></a> into your repository and use <code>include: local</code> with the same <code>inputs</code>.</p>
 
 
 
