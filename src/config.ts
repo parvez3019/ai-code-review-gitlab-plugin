@@ -18,6 +18,7 @@ export interface CliOptions {
     s3AccessKey?: string;
     s3SecretKey?: string;
     attribution?: boolean;
+    dryRun?: boolean;
 }
 
 export interface ResolvedConfig {
@@ -37,12 +38,16 @@ export interface ResolvedConfig {
     s3AccessKey?: string;
     s3SecretKey?: string;
     attribution: boolean;
+    dryRun: boolean;
 }
 
 type Env = Record<string, string | undefined>;
 
 const first = (...values: Array<string | undefined>): string | undefined =>
     values.find((v) => v !== undefined && v !== '');
+
+const isTruthy = (value?: string): boolean =>
+    value !== undefined && ['true', '1', 'yes', 'on'].includes(value.trim().toLowerCase());
 
 const isFalsy = (value?: string): boolean =>
     value !== undefined && ['false', '0', 'no', 'off'].includes(value.trim().toLowerCase());
@@ -123,5 +128,6 @@ export function resolveConfig(opts: CliOptions, env: Env = process.env): Resolve
         s3AccessKey: first(opts.s3AccessKey, env.S3_ACCESS_KEY),
         s3SecretKey: first(opts.s3SecretKey, env.S3_SECRET_KEY),
         attribution: opts.attribution !== false && !isFalsy(env.AI_REVIEW_ATTRIBUTION),
+        dryRun: opts.dryRun === true || isTruthy(env.AI_REVIEW_DRY_RUN),
     };
 }

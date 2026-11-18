@@ -28,7 +28,8 @@ program
     .option('--s3-region <string>', 'AWS Region for S3 (if using S3 paths)')
     .option('--s3-access-key <string>', 'AWS Access Key ID for S3 (if using S3 paths)')
     .option('--s3-secret-key <string>', 'AWS Secret Access Key for S3 (if using S3 paths)')
-    .option('--no-attribution', 'Do not add the "Reviewed by" footer to the summary comment');
+    .option('--no-attribution', 'Do not add the "Reviewed by" footer to the summary comment')
+    .option('--dry-run', 'Print review comments to stdout instead of posting them to GitLab (default: $AI_REVIEW_DRY_RUN)');
 
 const ATTRIBUTION_FOOTER =
     '\n\n---\n<sub>🤖 Reviewed by [ai-code-review-gitlab-plugin](https://github.com/parvez3019/ai-code-review-gitlab-plugin)</sub>';
@@ -138,7 +139,13 @@ async function run(argv: string[] = process.argv) {
                             });
                             continue;
                         }
-                        await gitlab.addReviewComment(lineObj, change, suggestion);
+                        if (cfg.dryRun) {
+                            console.log(`[dry-run] ${change.new_path}:${lineObj.new_line ?? lineObj.old_line}
+${suggestion}
+`);
+                        } else {
+                            await gitlab.addReviewComment(lineObj, change, suggestion);
+                        }
                     } catch (e: any) {
                         if (e?.response?.status === 429) {
                             console.log('Too Many Requests, try again');
@@ -159,7 +166,13 @@ async function run(argv: string[] = process.argv) {
             `- File: \`${log.file}\`, Line: ${log.line.new_line ?? log.line.old_line}`
         ).join('\n')}${cfg.attribution ? ATTRIBUTION_FOOTER : ''}`;
 
-        await gitlab.addComment(summaryMessage);
+        if (cfg.dryRun) {
+            console.log(`[dry-run] Summary comment (not posted):
+${summaryMessage}
+`);
+        } else {
+            await gitlab.addComment(summaryMessage);
+        }
     }
 
     console.log('done');

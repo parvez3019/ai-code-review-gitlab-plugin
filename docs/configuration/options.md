@@ -24,5 +24,6 @@ Precedence: **CLI flag → environment variable → default.**
 | `--s3-access-key` | `S3_ACCESS_KEY` | – | Credentials for S3 prompt files |
 | `--s3-secret-key` | `S3_SECRET_KEY` | – | Credentials for S3 prompt files |
 | `--no-attribution` | `AI_REVIEW_ATTRIBUTION=false` | attribution on | Remove the small "Reviewed by" footer from the summary note |
+| `--dry-run` | `AI_REVIEW_DRY_RUN=true` | off | Print each review comment (`file:line` + text) and the summary to stdout instead of posting to GitLab. The AI provider is still called |
 
 If required settings are missing, the CLI lists **all** of them at once and exits with code 1.
