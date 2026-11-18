@@ -26,3 +26,18 @@ test('getLineObj sets both lines when the hunk ends with context', () => {
     const hunk = '@@ -1,2 +1,3 @@\n a\n+b\n c\n';
     assert.deepStrictEqual(getLineObj(LINE_REGEX.exec(hunk), hunk), {new_line: 3, old_line: 2});
 });
+
+test('isExcluded matches names in any directory, paths and ** globs', () => {
+    const {isExcluded} = require('../lib/utils');
+    assert.ok(isExcluded('package-lock.json', ['package-lock.json']));
+    assert.ok(isExcluded('web/package-lock.json', ['package-lock.json']));
+    assert.ok(isExcluded('src/__snapshots__/a.test.ts.snap', ['*.snap']));
+    assert.ok(isExcluded('dist/a/b.js', ['dist/**']));
+    assert.ok(isExcluded('api/v1/x.pb.go', ['**/*.pb.go']));
+    assert.ok(isExcluded('x.pb.go', ['**/*.pb.go']));
+    assert.ok(isExcluded('src/gen/a.ts', ['src/gen/*.ts']));
+    assert.ok(!isExcluded('src/gen/sub/a.ts', ['src/gen/*.ts']));
+    assert.ok(!isExcluded('src/app.ts', ['*.snap', 'package-lock.json']));
+    assert.ok(!isExcluded('my-package-lock.json.ts', ['package-lock.json']));
+    assert.ok(!isExcluded(undefined, ['*']));
+});

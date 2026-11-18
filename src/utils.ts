@@ -103,6 +103,49 @@ export const geminiCompletionsConfig = {
     model: "gemini-3.5-flash",
 }
 
+const globToRegExp = (glob: string): RegExp => {
+    let re = '';
+    for (let i = 0; i < glob.length; i++) {
+        const c = glob[i];
+        if (c === '*') {
+            if (glob[i + 1] === '*') {
+                // "**/" matches zero or more directories; a bare "**" matches anything
+                if (glob[i + 2] === '/') {
+                    re += '(?:.*/)?';
+                    i += 2;
+                } else {
+                    re += '.*';
+                    i += 1;
+                }
+            } else {
+                re += '[^/]*';
+            }
+        } else if (c === '?') {
+            re += '[^/]';
+        } else {
+            re += c.replace(/[.+^${}()|[\]\\]/g, '\\$&');
+        }
+    }
+    return new RegExp(`^${re}$`);
+};
+
+/**
+ * Whether a changed file path matches any exclude glob. Supports `*`, `?` and `**`.
+ * A pattern without a slash (e.g. `*.snap`) matches the file name in any directory;
+ * a pattern with a slash is matched against the whole path.
+ */
+export const isExcluded = (filePath: string | undefined, patterns: string[]): boolean => {
+    if (!filePath) return false;
+    const normalized = filePath.replace(/\\/g, '/').replace(/^\.?\//, '');
+    const baseName = normalized.slice(normalized.lastIndexOf('/') + 1);
+    return patterns.some((pattern) => {
+        const glob = pattern.trim().replace(/^\.?\//, '');
+        if (!glob) return false;
+        const regex = globToRegExp(glob);
+        return regex.test(glob.includes('/') ? normalized : baseName);
+    });
+};
+
 export const delay = (time: number) => {
     return new Promise(resolve => setTimeout(resolve, time));
 }

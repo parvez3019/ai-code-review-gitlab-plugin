@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `--exclude <globs...>` (or `AI_REVIEW_EXCLUDE`, comma-separated) skips matching files. Common lockfiles are excluded by default.
+
 ## 0.1.0
 
 ### Added

@@ -18,6 +18,7 @@ export interface CliOptions {
     s3AccessKey?: string;
     s3SecretKey?: string;
     attribution?: boolean;
+    exclude?: string[];
 }
 
 export interface ResolvedConfig {
@@ -37,7 +38,22 @@ export interface ResolvedConfig {
     s3AccessKey?: string;
     s3SecretKey?: string;
     attribution: boolean;
+    /** Glob patterns of changed files that are not reviewed. */
+    exclude: string[];
 }
+
+/** Files skipped by default: dependency lockfiles are generated and noisy to review. */
+export const DEFAULT_EXCLUDES = [
+    'package-lock.json',
+    'npm-shrinkwrap.json',
+    'yarn.lock',
+    'pnpm-lock.yaml',
+    'composer.lock',
+    'Gemfile.lock',
+    'poetry.lock',
+    'Cargo.lock',
+    'go.sum',
+];
 
 type Env = Record<string, string | undefined>;
 
@@ -102,6 +118,10 @@ export function resolveConfig(opts: CliOptions, env: Env = process.env): Resolve
             break;
     }
 
+    const excludeFromEnv = first(env.AI_REVIEW_EXCLUDE)?.split(',').map((p) => p.trim()).filter(Boolean);
+    const excludeFromFlag = opts.exclude?.map((p) => p.trim()).filter(Boolean);
+    const exclude = excludeFromFlag?.length ? excludeFromFlag : excludeFromEnv?.length ? excludeFromEnv : DEFAULT_EXCLUDES;
+
     if (missing.length) {
         throw new Error(`Missing required configuration:\n  - ${missing.join('\n  - ')}`);
     }
@@ -123,5 +143,6 @@ export function resolveConfig(opts: CliOptions, env: Env = process.env): Resolve
         s3AccessKey: first(opts.s3AccessKey, env.S3_ACCESS_KEY),
         s3SecretKey: first(opts.s3SecretKey, env.S3_SECRET_KEY),
         attribution: opts.attribution !== false && !isFalsy(env.AI_REVIEW_ATTRIBUTION),
+        exclude,
     };
 }
