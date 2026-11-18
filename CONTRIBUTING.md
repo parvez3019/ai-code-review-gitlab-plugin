@@ -23,7 +23,7 @@ Requires Node.js 20+.
 | `src/ai-client.ts` | `AICodeReviewClient` interface |
 | `src/{gemini,bedrock,anthropic,openai}.ts` | Provider implementations |
 | `src/prompts/` | Default prompts |
-| `templates/` | GitLab CI/CD Catalog component |
+| `templates/` | Reusable GitLab CI template (`include: remote`) |
 | `docs/` + `mkdocs.yml` | Documentation site |
 
 ### Adding a provider

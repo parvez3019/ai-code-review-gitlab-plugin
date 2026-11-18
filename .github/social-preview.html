@@ -1,0 +1,81 @@
+<!doctype html>
+<!-- Source for docs/assets/social-preview.png (1280x640). Regenerate with:
+     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --hide-scrollbars \
+       --force-device-scale-factor=1 --window-size=1280,640 \
+       --screenshot=docs/assets/social-preview.png .github/social-preview.html -->
+<html><head><meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1280px; height: 640px; overflow: hidden; }
+  body {
+    font-family: -apple-system, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    background: radial-gradient(1200px 600px at 85% 10%, #3b1d12 0%, transparent 60%),
+                radial-gradient(900px 500px at 0% 100%, #1d1530 0%, transparent 60%),
+                #0f1117;
+    color: #f4f4f6;
+    display: flex; padding: 64px 72px; gap: 56px;
+  }
+  .left { flex: 1.1; display: flex; flex-direction: column; justify-content: center; }
+  .badge { display: inline-flex; align-items: center; gap: 10px; font-size: 20px; color: #ffb38a;
+           font-weight: 600; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 22px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #fc6d26; box-shadow: 0 0 16px #fc6d26; }
+  h1 { font-size: 64px; line-height: 1.04; font-weight: 800; letter-spacing: -0.02em; }
+  h1 span { background: linear-gradient(90deg, #fc6d26, #fca326); -webkit-background-clip: text; color: transparent; }
+  p.sub { font-size: 25px; line-height: 1.4; color: #b8bcc8; margin-top: 22px; max-width: 560px; }
+  .pills { display: flex; flex-wrap: nowrap; gap: 8px; margin-top: 30px; }
+  .pill { font-size: 18px; padding: 7px 13px; border-radius: 999px; border: 1px solid #2c3040;
+          background: #171a24; color: #dfe2ea; font-weight: 500; white-space: nowrap; }
+  .cmd { margin-top: 30px; font-family: "SF Mono", Menlo, monospace; font-size: 19px; color: #9fe0a8;
+         background: #0a0c11; border: 1px solid #23273a; border-radius: 10px; padding: 12px 18px; display: inline-block; }
+  .cmd b { color: #6b7088; font-weight: 400; }
+
+  .right { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .card { background: #161922; border: 1px solid #2a2e3d; border-radius: 16px; overflow: hidden;
+          box-shadow: 0 30px 80px rgba(0,0,0,.55); }
+  .file { font-family: "SF Mono", Menlo, monospace; font-size: 15px; color: #9aa0b4; padding: 12px 18px;
+          border-bottom: 1px solid #2a2e3d; background: #12141c; }
+  .code { font-family: "SF Mono", Menlo, monospace; font-size: 14.5px; line-height: 1.75; padding: 8px 0; }
+  .ln { display: flex; padding: 0 18px; }
+  .ln i { width: 34px; color: #4d5266; font-style: normal; }
+  .add { background: rgba(46,160,67,.16); color: #b7f0c1; }
+  .del { background: rgba(248,81,73,.14); color: #ffc1bd; }
+  .ctx { color: #c9ccd6; }
+  .comment { margin: 6px 14px 16px; border: 1px solid #3a2f2a; background: #1d1a1a; border-radius: 12px; padding: 14px 16px; }
+  .who { display: flex; align-items: center; gap: 10px; font-size: 15px; color: #e6e6ea; font-weight: 600; }
+  .avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg,#fc6d26,#e24329);
+            display: grid; place-items: center; font-size: 15px; }
+  .who small { color: #8a8fa3; font-weight: 400; }
+  .body { margin-top: 8px; font-size: 16px; line-height: 1.5; color: #d7d9e0; }
+  .body code { font-family: "SF Mono", Menlo, monospace; font-size: 14.5px; background: #2a2730; padding: 1px 6px; border-radius: 5px; color: #ffd2b8; }
+  .tag { color: #fca326; font-weight: 700; }
+</style></head>
+<body>
+  <div class="left">
+    <div class="badge"><span class="dot"></span>Open source · MIT</div>
+    <h1>AI code review for <span>GitLab</span> merge requests</h1>
+    <p class="sub">Inline review comments on every MR, with your own model, your own keys, in your own runners.</p>
+    <div class="pills">
+      <span class="pill">AWS Bedrock</span>
+      <span class="pill">Claude</span>
+      <span class="pill">Gemini</span>
+      <span class="pill">OpenAI</span>
+      <span class="pill">Ollama</span>
+    </div>
+    <div class="cmd"><b>$</b> npx @parvez3019/ai-code-review-gitlab-plugin</div>
+  </div>
+  <div class="right">
+    <div class="card">
+      <div class="file">src/payments/refund.ts</div>
+      <div class="code">
+        <div class="ln ctx"><i>41</i>async function refund(orderId: string) {</div>
+        <div class="ln del"><i>42</i>- const order = await db.find(orderId);</div>
+        <div class="ln add"><i>42</i>+ const order = db.query(</div>
+        <div class="ln add"><i>43</i>+   `SELECT * FROM orders WHERE id=${orderId}`);</div>
+      </div>
+      <div class="comment">
+        <div class="who"><span class="avatar">🤖</span>ai-code-review <small>· just now</small></div>
+        <div class="body"><span class="tag">[Bugs]</span> SQL injection: <code>orderId</code> is interpolated into the query. Use a parameterised query, and restore the dropped <code>await</code>.</div>
+      </div>
+    </div>
+  </div>
+</body></html>

@@ -38,7 +38,7 @@ ai-code-review:
 Open a merge request. Review comments appear on the diff within a minute or two.
 
 !!! tip "Prefer a one-line include?"
-    Use the [CI/CD Catalog component](getting-started/ci-catalog.md) or the prebuilt [Docker image](getting-started/docker.md) to skip the `npm install` on every pipeline.
+    Use the [reusable CI template](getting-started/ci-template.md) or the prebuilt [Docker image](getting-started/docker.md) to skip the `npm install` on every pipeline.
 
 ## How it works
 
