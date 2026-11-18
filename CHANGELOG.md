@@ -7,7 +7,7 @@
 - **Anthropic API provider** (`--ai-provider anthropic`).
 - **OpenAI-compatible provider** (`--ai-provider openai`) for OpenAI, Ollama, vLLM, LM Studio, LiteLLM and OpenRouter.
 - `--api-url` option to point any provider at a custom base URL.
-- GitLab **CI/CD Catalog component** (`templates/ai-code-review.yml`).
+- Reusable **GitLab CI template with inputs** (`templates/ai-code-review.yml`), usable with a single `include: remote`.
 - **Docker image** published to `ghcr.io/parvez3019/ai-code-review-gitlab-plugin`.
 - Small "Reviewed by" footer on the summary note. Disable it with `--no-attribution` or `AI_REVIEW_ATTRIBUTION=false`.
 - Documentation site, test suite and CI.

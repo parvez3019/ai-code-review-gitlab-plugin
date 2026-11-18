@@ -20,7 +20,7 @@ A small, auditable CLI that reads a merge request diff, asks an LLM to review ea
 - 🔑 **Bring your own model**: Claude on **AWS Bedrock** or the **Anthropic API**, **Google Gemini**, or any **OpenAI-compatible** endpoint (OpenAI, **Ollama**, vLLM, LiteLLM, OpenRouter…)
 - 🔒 **Your code stays in your cloud**: no SaaS in the middle; fully air-gapped with Ollama
 - ⚡ **Zero-flag GitLab CI setup**: reads `CI_MERGE_REQUEST_IID`, `CI_MERGE_REQUEST_PROJECT_ID`, `CI_API_V4_URL` automatically
-- 🧩 Ships as an **npm package**, a **Docker image** and a **GitLab CI/CD Catalog component**
+- 🧩 Ships as an **npm package**, a **Docker image** and a **one-line reusable CI template**
 - 📝 **Custom prompts** from a repo file or S3, so you can enforce your own review checklist
 - 🚦 Automatic retry on rate limits; works with gitlab.com and self-managed GitLab
 
@@ -41,11 +41,11 @@ ai-code-review:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 ```
 
-Or include the CI/CD component:
+Or use the reusable template in a single include:
 
 ```yaml
 include:
-  - component: gitlab.com/parvez3019/ai-code-review-gitlab-plugin/ai-code-review@~latest
+  - remote: https://raw.githubusercontent.com/parvez3019/ai-code-review-gitlab-plugin/0.1.0/templates/ai-code-review.yml
     inputs:
       provider: anthropic
 ```
@@ -74,7 +74,7 @@ There's a fuller, honest [comparison in the docs](https://parvez3019.github.io/a
 
 ## Documentation
 
-- [GitLab CI setup](https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/gitlab-ci/) · [CI/CD component](https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/ci-catalog/) · [Docker](https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/docker/) · [CLI](https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/cli/)
+- [GitLab CI setup](https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/gitlab-ci/) · [One-line CI template](https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/ci-template/) · [Docker](https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/docker/) · [CLI](https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/cli/)
 - [All options](https://parvez3019.github.io/ai-code-review-gitlab-plugin/configuration/options/) · [Environment variables](https://parvez3019.github.io/ai-code-review-gitlab-plugin/configuration/env-vars/) · [Custom prompts](https://parvez3019.github.io/ai-code-review-gitlab-plugin/configuration/custom-prompts/)
 - [Webhook trigger](https://parvez3019.github.io/ai-code-review-gitlab-plugin/guides/webhook-trigger/) · [Self-managed GitLab](https://parvez3019.github.io/ai-code-review-gitlab-plugin/guides/self-hosted-gitlab/) · [Troubleshooting](https://parvez3019.github.io/ai-code-review-gitlab-plugin/troubleshooting/)
 
