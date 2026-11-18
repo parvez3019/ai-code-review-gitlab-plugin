@@ -70,3 +70,10 @@ test('attribution can be disabled by flag or env var', () => {
     assert.strictEqual(resolveConfig({attribution: false}, env).attribution, false);
     assert.strictEqual(resolveConfig({}, {...env, AI_REVIEW_ATTRIBUTION: 'false'}).attribution, false);
 });
+
+test('exclude defaults to lockfiles; flag wins over AI_REVIEW_EXCLUDE', () => {
+    const env = {...ciEnv, GEMINI_API_KEY: 'g'};
+    assert.ok(resolveConfig({}, env).exclude.includes('package-lock.json'));
+    assert.deepStrictEqual(resolveConfig({}, {...env, AI_REVIEW_EXCLUDE: '*.snap, dist/**'}).exclude, ['*.snap', 'dist/**']);
+    assert.deepStrictEqual(resolveConfig({exclude: ['*.pb.go']}, {...env, AI_REVIEW_EXCLUDE: '*.snap'}).exclude, ['*.pb.go']);
+});

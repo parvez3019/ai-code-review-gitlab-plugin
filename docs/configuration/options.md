@@ -24,5 +24,18 @@ Precedence: **CLI flag → environment variable → default.**
 | `--s3-access-key` | `S3_ACCESS_KEY` | – | Credentials for S3 prompt files |
 | `--s3-secret-key` | `S3_SECRET_KEY` | – | Credentials for S3 prompt files |
 | `--no-attribution` | `AI_REVIEW_ATTRIBUTION=false` | attribution on | Remove the small "Reviewed by" footer from the summary note |
+| `--exclude <globs...>` | `AI_REVIEW_EXCLUDE` (comma-separated) | common lockfiles | Glob patterns of changed files to skip (see below) |
+
+## Excluding files
+
+`--exclude` takes one or more globs (`*`, `?` and `**` are supported) that are matched against the changed file's path. A pattern without a `/` (such as `*.snap`) matches the file name in any directory; a pattern with a `/` (such as `dist/**` or `src/generated/*.ts`) is matched against the whole path.
+
+```bash
+ai-code-review-gitlab-plugin --exclude "*.snap" "dist/**" "**/*.pb.go"
+# or
+AI_REVIEW_EXCLUDE="*.snap,dist/**" ai-code-review-gitlab-plugin
+```
+
+By default these lockfiles are skipped: `package-lock.json`, `npm-shrinkwrap.json`, `yarn.lock`, `pnpm-lock.yaml`, `composer.lock`, `Gemfile.lock`, `poetry.lock`, `Cargo.lock`, `go.sum`. Passing your own patterns **replaces** this list, so include the lockfiles again if you still want them skipped.
 
 If required settings are missing, the CLI lists **all** of them at once and exits with code 1.

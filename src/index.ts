@@ -6,7 +6,7 @@ import {AnthropicClient} from './anthropic';
 import {OpenAICompatibleClient} from './openai';
 import {AICodeReviewClient, AIClientConfig} from './ai-client';
 import {resolveConfig, ResolvedConfig, PROVIDERS} from './config';
-import {delay, getDiffBlocks, getLineObj, getSystemPrompt, getCodeReviewPrompt} from "./utils";
+import {delay, isExcluded, getDiffBlocks, getLineObj, getSystemPrompt, getCodeReviewPrompt} from "./utils";
 
 const program = new Command();
 
@@ -28,7 +28,8 @@ program
     .option('--s3-region <string>', 'AWS Region for S3 (if using S3 paths)')
     .option('--s3-access-key <string>', 'AWS Access Key ID for S3 (if using S3 paths)')
     .option('--s3-secret-key <string>', 'AWS Secret Access Key for S3 (if using S3 paths)')
-    .option('--no-attribution', 'Do not add the "Reviewed by" footer to the summary comment');
+    .option('--no-attribution', 'Do not add the "Reviewed by" footer to the summary comment')
+    .option('--exclude <globs...>', 'Glob patterns of files to skip, e.g. "*.snap" "dist/**" (default: $AI_REVIEW_EXCLUDE, comma-separated, or common lockfiles)');
 
 const ATTRIBUTION_FOOTER =
     '\n\n---\n<sub>🤖 Reviewed by [ai-code-review-gitlab-plugin](https://github.com/parvez3019/ai-code-review-gitlab-plugin)</sub>';
@@ -110,6 +111,10 @@ async function run(argv: string[] = process.argv) {
     const noFeedbackLogs: Array<{file: string, line: any, code: string}> = [];
 
     for (const change of changes) {
+        if (isExcluded(change.new_path, cfg.exclude)) {
+            console.log(`Skipping excluded file: ${change.new_path}`);
+            continue;
+        }
         if (change.renamed_file || change.deleted_file || !change?.diff?.startsWith('@@')) {
             continue;
         }
