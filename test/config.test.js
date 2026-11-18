@@ -70,3 +70,11 @@ test('attribution can be disabled by flag or env var', () => {
     assert.strictEqual(resolveConfig({attribution: false}, env).attribution, false);
     assert.strictEqual(resolveConfig({}, {...env, AI_REVIEW_ATTRIBUTION: 'false'}).attribution, false);
 });
+
+test('dry run is off by default and enabled by flag or AI_REVIEW_DRY_RUN', () => {
+    const env = {...ciEnv, GEMINI_API_KEY: 'g'};
+    assert.strictEqual(resolveConfig({}, env).dryRun, false);
+    assert.strictEqual(resolveConfig({dryRun: true}, env).dryRun, true);
+    assert.strictEqual(resolveConfig({}, {...env, AI_REVIEW_DRY_RUN: 'true'}).dryRun, true);
+    assert.strictEqual(resolveConfig({}, {...env, AI_REVIEW_DRY_RUN: 'false'}).dryRun, false);
+});

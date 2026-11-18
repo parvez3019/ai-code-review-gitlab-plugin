@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `--dry-run` (or `AI_REVIEW_DRY_RUN=true`) prints review comments to stdout instead of posting them to the merge request.
+
 ## 0.1.0
 
 ### Added
