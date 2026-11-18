@@ -18,6 +18,7 @@ export interface CliOptions {
     s3AccessKey?: string;
     s3SecretKey?: string;
     attribution?: boolean;
+    maxHunks?: string;
 }
 
 export interface ResolvedConfig {
@@ -37,6 +38,8 @@ export interface ResolvedConfig {
     s3AccessKey?: string;
     s3SecretKey?: string;
     attribution: boolean;
+    /** Maximum number of hunks to send to the AI; undefined means no limit. */
+    maxHunks?: number;
 }
 
 type Env = Record<string, string | undefined>;
@@ -102,6 +105,15 @@ export function resolveConfig(opts: CliOptions, env: Env = process.env): Resolve
             break;
     }
 
+    const maxHunksRaw = first(opts.maxHunks, env.AI_REVIEW_MAX_HUNKS);
+    let maxHunks: number | undefined;
+    if (maxHunksRaw !== undefined) {
+        if (!/^\d+$/.test(maxHunksRaw.trim()) || Number(maxHunksRaw) < 1) {
+            throw new Error(`Invalid --max-hunks / AI_REVIEW_MAX_HUNKS value: "${maxHunksRaw}" (expected a positive integer)`);
+        }
+        maxHunks = Number(maxHunksRaw);
+    }
+
     if (missing.length) {
         throw new Error(`Missing required configuration:\n  - ${missing.join('\n  - ')}`);
     }
@@ -123,5 +135,6 @@ export function resolveConfig(opts: CliOptions, env: Env = process.env): Resolve
         s3AccessKey: first(opts.s3AccessKey, env.S3_ACCESS_KEY),
         s3SecretKey: first(opts.s3SecretKey, env.S3_SECRET_KEY),
         attribution: opts.attribution !== false && !isFalsy(env.AI_REVIEW_ATTRIBUTION),
+        maxHunks,
     };
 }

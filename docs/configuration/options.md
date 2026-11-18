@@ -24,5 +24,6 @@ Precedence: **CLI flag → environment variable → default.**
 | `--s3-access-key` | `S3_ACCESS_KEY` | – | Credentials for S3 prompt files |
 | `--s3-secret-key` | `S3_SECRET_KEY` | – | Credentials for S3 prompt files |
 | `--no-attribution` | `AI_REVIEW_ATTRIBUTION=false` | attribution on | Remove the small "Reviewed by" footer from the summary note |
+| `--max-hunks <n>` | `AI_REVIEW_MAX_HUNKS` | unlimited | Review at most *n* diff hunks (each hunk is one LLM call); the rest are skipped and a note says how many |
 
 If required settings are missing, the CLI lists **all** of them at once and exits with code 1.

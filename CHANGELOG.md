@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `--max-hunks <n>` (or `AI_REVIEW_MAX_HUNKS`) limits how many diff hunks are reviewed on large merge requests; a note reports how many were skipped.
+
 ## 0.1.0
 
 ### Added
