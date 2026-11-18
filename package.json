@@ -1,22 +1,58 @@
 {
   "name": "@parvez3019/ai-code-review-gitlab-plugin",
-  "version": "0.0.11",
-  "main": "index.js",
+  "version": "0.1.0",
+  "description": "AI code review bot for GitLab merge requests: inline review comments using Claude (AWS Bedrock or Anthropic API), Gemini, OpenAI or local models via Ollama. Drop-in GitLab CI job.",
+  "main": "lib/index.js",
   "bin": {
     "ai-code-review-gitlab-plugin": "bin/index.js"
   },
   "scripts": {
     "start": "tsc --watch",
-    "build": "tsc && cp -r src/prompts lib/"
+    "build": "tsc && cp -r src/prompts lib/",
+    "test": "npm run build && node --test test/*.test.js"
   },
   "files": [
     "lib",
     "bin"
   ],
   "license": "MIT",
+  "author": "parvez3019",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/parvez3019/ai-code-review-gitlab-plugin"
+  },
+  "bugs": {
+    "url": "https://github.com/parvez3019/ai-code-review-gitlab-plugin/issues"
+  },
+  "homepage": "https://parvez3019.github.io/ai-code-review-gitlab-plugin/",
+  "keywords": [
+    "ai-code-review",
+    "code-review",
+    "code-review-bot",
+    "gitlab",
+    "gitlab-ci",
+    "gitlab-merge-request",
+    "merge-request",
+    "pull-request-review",
+    "ai",
+    "llm",
+    "claude",
+    "anthropic",
+    "aws-bedrock",
+    "bedrock",
+    "gemini",
+    "openai",
+    "ollama",
+    "ci-cd",
+    "devops",
+    "static-analysis"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.525.0",
@@ -27,28 +63,5 @@
     "axios": "^1.4.0",
     "commander": "^10.0.1",
     "typescript": "^5.0.4"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "description": "![](screenshots/screenshot-1.png)",
-  "bugs": {
-    "url": "https://github.com/parvez3019/ai-code-review-gitlab-plugin/issues"
-  },
-  "homepage": "https://github.com/parvez3019/ai-code-review-gitlab-plugin#readme",
-  "keywords": [
-    "AI",
-    "Gemini",
-    "Code",
-    "Reviewer",
-    "Gitlab CI",
-    "Gitlab",
-    "AWS Bedrock",
-    "Claude"
-  ],
-  "author": "parvez3019"
+  }
 }

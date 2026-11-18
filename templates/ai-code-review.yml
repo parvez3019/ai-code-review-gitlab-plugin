@@ -1,0 +1,36 @@
+spec:
+  inputs:
+    stage:
+      default: test
+      description: Pipeline stage the review job runs in.
+    provider:
+      default: gemini
+      options: [gemini, bedrock, anthropic, openai]
+      description: AI provider. Credentials are read from CI/CD variables (see docs).
+    model:
+      default: ''
+      description: Model ID. Leave empty to use the provider default.
+    image:
+      default: ghcr.io/parvez3019/ai-code-review-gitlab-plugin:latest
+      description: Container image that has the CLI installed.
+    allow_failure:
+      default: true
+      type: boolean
+      description: Do not block the pipeline if the review fails.
+    when:
+      default: on_success
+      options: [on_success, manual]
+      description: Run automatically on every MR pipeline, or only when triggered manually.
+---
+ai-code-review:
+  stage: $[[ inputs.stage ]]
+  image: $[[ inputs.image ]]
+  variables:
+    AI_PROVIDER: $[[ inputs.provider ]]
+    AI_MODEL: $[[ inputs.model ]]
+  script:
+    - ai-code-review-gitlab-plugin
+  allow_failure: $[[ inputs.allow_failure ]]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: $[[ inputs.when ]]

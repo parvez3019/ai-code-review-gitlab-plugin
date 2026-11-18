@@ -2,6 +2,9 @@ import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedroc
 import { AICodeReviewClient, AIClientConfig } from "./ai-client";
 import { getSystemPrompt, getCodeReviewPrompt } from "./utils";
 
+// Newer Claude models on Bedrock must be invoked through a cross-region inference profile.
+export const DEFAULT_BEDROCK_MODEL = "us.anthropic.claude-sonnet-5";
+
 // Types for Bedrock response
 interface BedrockResponse {
     content: Array<{
@@ -30,15 +33,15 @@ export class BedrockClient implements AICodeReviewClient {
 
         this.config = config;
         this.client = new BedrockRuntimeClient({
-            region: process.env.AWS_REGION || config.region || "us-east-1",
+            region: config.region || process.env.AWS_REGION || "us-east-1",
             credentials: {
                 accessKeyId: config.apiKey,
                 secretAccessKey: config.apiSecret,
             },
         });
 
-        // Use environment variable, config, or default model
-        this.model = process.env.AWS_BEDROCK_MODEL || config.model || "anthropic.claude-3-5-sonnet-20241022-v2:0";
+        // Explicit config wins, then environment variable, then default model
+        this.model = config.model || process.env.AWS_BEDROCK_MODEL || DEFAULT_BEDROCK_MODEL;
     }
 
     private async sleep(ms: number): Promise<void> {
