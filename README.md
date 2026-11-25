@@ -16,13 +16,16 @@ A small, auditable CLI that reads a merge request diff, asks an LLM to review ea
 
 ## Features
 
-- 💬 **Inline comments** on the changed line, plus one summary note for hunks that need no feedback
+- 💬 **Inline comments on the exact line**, with severity and one-click GitLab suggestions, plus one summary note that is updated in place
+- 🔁 **No duplicate comments on new pushes**: each commit is reviewed once, and only files changed since the last review are reviewed again
+- 🎯 **Low noise**: skips lockfiles and generated code, filters by severity, and sends the full file and MR description as context
 - 🔑 **Bring your own model**: Claude on **AWS Bedrock** or the **Anthropic API**, **Google Gemini**, or any **OpenAI-compatible** endpoint (OpenAI, **Ollama**, vLLM, LiteLLM, OpenRouter…)
 - 🔒 **Your code stays in your cloud**: no SaaS in the middle; fully air-gapped with Ollama
 - ⚡ **Zero-flag GitLab CI setup**: reads `CI_MERGE_REQUEST_IID`, `CI_MERGE_REQUEST_PROJECT_ID`, `CI_API_V4_URL` automatically
 - 🧩 Ships as an **npm package**, a **Docker image** and a **one-line reusable CI template**
-- 📝 **Custom prompts** from a repo file or S3, so you can enforce your own review checklist
-- 🚦 Automatic retry on rate limits; works with gitlab.com and self-managed GitLab
+- 📝 **Custom prompts** from a repo file or S3, plus an optional `.ai-review.yml` per repository
+- 🚦 `--fail-on` to block merges on serious findings, `--dry-run` to try prompts locally, and bounded retries on rate limits
+- Works with gitlab.com and self-managed GitLab
 
 ## Quick start (60 seconds)
 
@@ -65,7 +68,7 @@ Override the model with `AI_MODEL` or `--custom-model`.
 
 ## Why this instead of GitLab Duo, CodeRabbit or PR-Agent?
 
-- **Small and auditable**: under 1,000 lines of TypeScript that a security team can read in one sitting
+- **Small and auditable**: under 2,000 lines of TypeScript that a security team can read in one sitting
 - **CI-native**: one job, with no webhook server and no SaaS app to approve
 - **AWS-friendly**: reviews go through Bedrock in your own account
 - **Free (MIT)**: you only pay for the tokens you use
@@ -75,7 +78,7 @@ There's a fuller, honest [comparison in the docs](https://parvez3019.github.io/a
 ## Documentation
 
 - [GitLab CI setup](https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/gitlab-ci/) · [One-line CI template](https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/ci-template/) · [Docker](https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/docker/) · [CLI](https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/cli/)
-- [All options](https://parvez3019.github.io/ai-code-review-gitlab-plugin/configuration/options/) · [Environment variables](https://parvez3019.github.io/ai-code-review-gitlab-plugin/configuration/env-vars/) · [Custom prompts](https://parvez3019.github.io/ai-code-review-gitlab-plugin/configuration/custom-prompts/)
+- [All options](https://parvez3019.github.io/ai-code-review-gitlab-plugin/configuration/options/) · [Repository config file](https://parvez3019.github.io/ai-code-review-gitlab-plugin/configuration/config-file/) · [Environment variables](https://parvez3019.github.io/ai-code-review-gitlab-plugin/configuration/env-vars/) · [Custom prompts](https://parvez3019.github.io/ai-code-review-gitlab-plugin/configuration/custom-prompts/)
 - [Webhook trigger](https://parvez3019.github.io/ai-code-review-gitlab-plugin/guides/webhook-trigger/) · [Self-managed GitLab](https://parvez3019.github.io/ai-code-review-gitlab-plugin/guides/self-hosted-gitlab/) · [Troubleshooting](https://parvez3019.github.io/ai-code-review-gitlab-plugin/troubleshooting/)
 
 ## Contributing

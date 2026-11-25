@@ -43,12 +43,12 @@ Open a merge request. Review comments appear on the diff within a minute or two.
 ## How it works
 
 ```text
-MR pipeline ──► fetch MR diffs (GitLab API)
-             ──► split each file into hunks
-             ──► send hunk + review prompt to your LLM
-             ──► LLM answers with feedback, or "204" (nothing significant)
-             ──► post feedback as an inline discussion on that line
-             ──► post one summary note for the hunks with no feedback
+MR pipeline ──► fetch every MR diff (GitLab API, all pages)
+             ──► skip lockfiles, generated code and files unchanged since the last review
+             ──► send each file's diff (+ the full file and MR description) to your LLM
+             ──► LLM answers with JSON: line, severity, comment, optional fix
+             ──► post each finding inline on the exact line, with a one-click suggestion
+             ──► create or update one summary note on the MR
 ```
 
 ## Next steps

@@ -28,7 +28,7 @@ Requires Node.js 20+.
 
 ### Adding a provider
 
-1. Implement `AICodeReviewClient` in `src/<provider>.ts`. Re-throw HTTP errors so that `error.response.status === 429` triggers the retry.
+1. Implement `AICodeReviewClient` (`complete({system, user})`) in `src/<provider>.ts`. Throw the provider's original error, with its HTTP status, so `withRetry()` in `src/retry.ts` can retry 429s and 5xx. Never log request URLs or headers.
 2. Add it to `PROVIDERS` and the env-var mapping in `src/config.ts`.
 3. Wire it in `createAIClient()` in `src/index.ts`.
 4. Add a test in `test/providers.test.js` (there's a tiny fake HTTP server helper) and a page under `docs/providers/`.

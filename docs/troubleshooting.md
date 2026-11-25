@@ -16,15 +16,22 @@ The CLI lists every missing setting. In CI, make sure the job runs in a **merge 
 
 ## No comments appear
 
-- The model may have answered `204` for every hunk. Look for "No Feedback Summary" on the MR.
-- Renamed, deleted and binary files are skipped.
-- Check the job log for `Failed to review <file>` lines.
+- The model may have found nothing significant. The **AI code review** summary note lists the files with no comments.
+- Files may have been skipped. The summary note lists files that were excluded by path filters, too large (`--max-file-diff-lines`) or over the file limit (`--max-files`).
+- Findings below `--min-severity` are not posted.
+- The commit may already have been reviewed: the tool reviews each commit once and only re-reviews files that changed. Use `--no-incremental` to review everything again.
+- Deleted files, pure renames and binary files are skipped.
+- Check the job log for `Failed to review <file>` lines. Run with `--dry-run` locally to see what the model returns.
+
+## The job fails after posting comments
+
+The job exits with code 1 when a file could not be reviewed or a comment could not be posted (see the summary note), or when `--fail-on` is set and a finding reaches that severity. The reusable CI template uses `allow_failure: true` by default, so this never blocks a merge unless you change it.
 
 ## AWS Bedrock
 
 - **"The provided model identifier is invalid" / "on-demand throughput isn't supported"**: use an inference profile ID (`us.anthropic.…`). See [Bedrock](providers/bedrock.md#choosing-a-model-id).
 - **AccessDeniedException**: enable model access in the Bedrock console and check the [IAM policy](providers/bedrock.md#iam-permissions).
-- **Throttling**: the client retries 429/5xx with exponential backoff. For large MRs, request a quota increase or use a smaller model.
+- **Throttling**: requests are retried with backoff (see below). For large MRs, request a quota increase, lower `--concurrency` or use a smaller model.
 
 ## Gemini
 
@@ -33,4 +40,4 @@ The CLI lists every missing setting. In CI, make sure the job runs in a **merge 
 
 ## Rate limits (any provider)
 
-On HTTP 429 the tool waits 60 seconds and re-queues the hunk, so very large MRs can take a while. Consider `when: manual` for huge MRs.
+Rate limits (429), server errors (5xx) and network errors are retried up to 4 times with exponential backoff, honouring `Retry-After`. If a file still fails, it is listed in the summary note, the job exits with code 1, and the file is reviewed again on the next run. Lower `--concurrency` (default 2) if you hit rate limits often.

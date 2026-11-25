@@ -70,3 +70,36 @@ test('attribution can be disabled by flag or env var', () => {
     assert.strictEqual(resolveConfig({attribution: false}, env).attribution, false);
     assert.strictEqual(resolveConfig({}, {...env, AI_REVIEW_ATTRIBUTION: 'false'}).attribution, false);
 });
+
+test('new review settings have safe defaults', () => {
+    const cfg = resolveConfig({}, {...ciEnv, GEMINI_API_KEY: 'g'});
+    assert.deepStrictEqual(
+        [cfg.minSeverity, cfg.failOn, cfg.maxFiles, cfg.concurrency, cfg.dryRun, cfg.incremental, cfg.defaultExcludes, cfg.timeoutMs],
+        ['minor', undefined, 50, 2, false, true, true, 120000],
+    );
+});
+
+test('precedence is CLI flag, then env var, then config file', () => {
+    const env = {...ciEnv, GEMINI_API_KEY: 'g', AI_REVIEW_MIN_SEVERITY: 'major'};
+    const file = {min_severity: 'critical', max_files: 5, exclude: ['docs/**'], incremental: false};
+    const fromEnv = resolveConfig({}, env, file);
+    assert.strictEqual(fromEnv.minSeverity, 'major');
+    assert.strictEqual(fromEnv.maxFiles, 5);
+    assert.deepStrictEqual(fromEnv.exclude, ['docs/**']);
+    assert.strictEqual(fromEnv.incremental, false);
+    assert.strictEqual(resolveConfig({minSeverity: 'minor'}, env, file).minSeverity, 'minor');
+    assert.deepStrictEqual(resolveConfig({exclude: 'a/**, b/**'}, env, file).exclude, ['a/**', 'b/**']);
+});
+
+test('commander --no-x defaults (true) do not override env or file settings', () => {
+    const cfg = resolveConfig({incremental: true, attribution: true, defaultExcludes: true},
+        {...ciEnv, GEMINI_API_KEY: 'g', AI_REVIEW_INCREMENTAL: 'false'}, {default_excludes: false});
+    assert.strictEqual(cfg.incremental, false);
+    assert.strictEqual(cfg.defaultExcludes, false);
+});
+
+test('rejects invalid severities and numbers', () => {
+    assert.throws(() => resolveConfig({minSeverity: 'huge', maxFiles: '-1'}, {...ciEnv, GEMINI_API_KEY: 'g'}),
+        (err) => /min-severity/.test(err.message) && /max-files/.test(err.message));
+    assert.strictEqual(resolveConfig({failOn: 'none'}, {...ciEnv, GEMINI_API_KEY: 'g'}).failOn, undefined);
+});

@@ -17,7 +17,13 @@ Only the changed hunks, which keeps reviews focused and cheap.
 No. It's built for GitLab merge requests.
 
 **Can I stop it commenting on trivial things?**
-Yes. Tighten the [custom prompt](configuration/custom-prompts.md). Anything the model answers with `204` gets no comment.
+Yes. Raise `--min-severity` to `major` (or `critical`) to post only important findings, and tighten the [custom prompt](configuration/custom-prompts.md).
+
+**Will it comment again on every push?**
+No. The tool remembers the last reviewed commit in its summary note, reviews only files changed since then, and never posts a second comment on a line it has already commented on.
+
+**Can it block merges?**
+Yes. Set `--fail-on major` (or `AI_REVIEW_FAIL_ON`) and `allow_failure: false` on the job.
 
 **Can I remove the "Reviewed by" footer?**
 Yes. Use `--no-attribution` or `AI_REVIEW_ATTRIBUTION=false`. It only appears on the summary note.

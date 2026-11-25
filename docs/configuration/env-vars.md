@@ -38,3 +38,9 @@ description: Environment variables read by ai-code-review-gitlab-plugin, includi
 | `CODE_REVIEW_PROMPT_PATH` | Custom review prompt (file or `s3://`) |
 | `S3_REGION`, `S3_ACCESS_KEY`, `S3_SECRET_KEY` | Credentials for S3 prompt files |
 | `AI_REVIEW_ATTRIBUTION` | Set to `false` to remove the summary footer |
+
+## Review behaviour
+
+`AI_REVIEW_CONFIG`, `AI_REVIEW_INCLUDE`, `AI_REVIEW_EXCLUDE`, `AI_REVIEW_DEFAULT_EXCLUDES`, `AI_REVIEW_MIN_SEVERITY`, `AI_REVIEW_FAIL_ON`, `AI_REVIEW_MAX_FILES`, `AI_REVIEW_MAX_FILE_DIFF_LINES`, `AI_REVIEW_FILE_CONTEXT_CHARS`, `AI_REVIEW_CONCURRENCY`, `AI_REVIEW_TIMEOUT`, `AI_REVIEW_DRY_RUN`, `AI_REVIEW_INCREMENTAL`. See [CLI options](options.md#review-behaviour) for what each one does.
+
+`CI_PROJECT_DIR` (set by GitLab) is where `.ai-review.yml` is looked up.

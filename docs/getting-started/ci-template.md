@@ -25,8 +25,10 @@ This adds an `ai-code-review` job that runs in merge request pipelines and uses 
 | `stage` | `test` | Stage the job runs in |
 | `provider` | `gemini` | `gemini`, `bedrock`, `anthropic` or `openai` |
 | `model` | *(provider default)* | Model ID override |
-| `image` | `ghcr.io/parvez3019/ai-code-review-gitlab-plugin:latest` | Image that contains the CLI |
+| `image` | `ghcr.io/parvez3019/ai-code-review-gitlab-plugin:<release>` | Image that contains the CLI, pinned to the same release as the template |
 | `allow_failure` | `true` | Don't block the pipeline if the review fails |
+| `min_severity` | `minor` | Lowest severity posted as a comment: `minor`, `major`, `critical` |
+| `fail_on` | `none` | Fail the job on a finding at or above this severity |
 | `when` | `on_success` | `on_success` (every MR pipeline) or `manual` |
 
 ## Overriding the job
