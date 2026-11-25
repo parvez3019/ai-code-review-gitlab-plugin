@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://parvez3019.github.io/ai-code-review-gitlab-plugin/configuration/custom-prompts/">
       
       
-        <link rel="prev" href="../env-vars/">
+        <link rel="prev" href="../config-file/">
       
       
         <link rel="next" href="../../guides/webhook-trigger/">
@@ -676,6 +676,29 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../config-file/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Repository config file
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -729,9 +752,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-204-contract" class="md-nav__link">
+  <a href="#the-output-format-is-added-for-you" class="md-nav__link">
     <span class="md-ellipsis">
-      The 204 contract
+      The output format is added for you
     </span>
   </a>
   
@@ -1018,9 +1041,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-204-contract" class="md-nav__link">
+  <a href="#the-output-format-is-added-for-you" class="md-nav__link">
     <span class="md-ellipsis">
-      The 204 contract
+      The output format is added for you
     </span>
   </a>
   
@@ -1062,8 +1085,8 @@
 <h1 id="custom-prompts">Custom prompts<a class="headerlink" href="#custom-prompts" title="Permanent link">&para;</a></h1>
 <p>Two prompts drive every review:</p>
 <ul>
-<li><strong>System prompt</strong>: the reviewer's persona and standards (<a href="https://github.com/parvez3019/ai-code-review-gitlab-plugin/blob/main/src/prompts/system_prompt.txt">default</a>)</li>
-<li><strong>Code review prompt</strong>: the task instructions and output format (<a href="https://github.com/parvez3019/ai-code-review-gitlab-plugin/blob/main/src/prompts/code_review_prompt.txt">default</a>)</li>
+<li><strong>System prompt</strong>: the reviewer's persona and what to look for (<a href="https://github.com/parvez3019/ai-code-review-gitlab-plugin/blob/main/src/prompts/system_prompt.txt">default</a>)</li>
+<li><strong>Code review prompt</strong>: how to review each file and how to rate severity (<a href="https://github.com/parvez3019/ai-code-review-gitlab-plugin/blob/main/src/prompts/code_review_prompt.txt">default</a>)</li>
 </ul>
 <p>Override either with a local path (for example a file committed to the repository under review) or an <code>s3://bucket/key</code> URL shared across many projects.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">ai-code-review</span><span class="p">:</span>
@@ -1072,15 +1095,17 @@
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="nt">CODE_REVIEW_PROMPT_PATH</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">s3://my-org-prompts/code_review_prompt.txt</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="nt">S3_REGION</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">eu-west-1</span>
 </code></pre></div>
-<p>If a custom prompt can't be loaded, the tool logs a warning and falls back to the built-in prompt.</p>
-<h2 id="the-204-contract">The <code>204</code> contract<a class="headerlink" href="#the-204-contract" title="Permanent link">&para;</a></h2>
-<p>The tool treats a model response of exactly <code>204</code> as "no significant feedback". Those hunks are not commented on; they're listed in one summary note instead. <strong>Keep this instruction in your custom prompt</strong>, or every hunk will get a comment.</p>
+<p>The paths can also go in the <a href="../config-file/">repository config file</a>.</p>
+<p>If a custom prompt can't be loaded, the job <strong>fails</strong> with an error. It does not silently fall back to the built-in prompt, so a broken checklist never goes unnoticed.</p>
+<h2 id="the-output-format-is-added-for-you">The output format is added for you<a class="headerlink" href="#the-output-format-is-added-for-you" title="Permanent link">&para;</a></h2>
+<p>The tool always appends its own output instructions to your prompts: the model must answer with JSON listing a line, a severity (<code>critical</code>, <code>major</code>, <code>minor</code>) and a comment for each finding, with an optional replacement for the line. That is what lets the tool place comments on the exact line, offer one-click GitLab suggestions, and filter by severity.</p>
+<p>So your prompts only need to say <strong>what</strong> to review. You don't need to describe the response format, and older prompts that say "reply with 204" keep working: a <code>204</code> answer is treated as "no comments".</p>
 <h2 id="example-team-specific-checklist">Example: team-specific checklist<a class="headerlink" href="#example-team-specific-checklist" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>You are a senior engineer reviewing a Go microservice.
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>Focus only on: correctness, error handling, context propagation,
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>SQL injection, missing tests for new exported functions.
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>Ignore formatting and naming. Keep each comment under 50 words.
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>When there is nothing significant to say, reply with exactly: 204
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>Rate anything that can lose data or leak credentials as critical.
 </code></pre></div>
 
 
@@ -1120,7 +1145,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../env-vars/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Environment variables">
+          <a href="../config-file/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Repository config file">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1130,7 +1155,7 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Environment variables
+                Repository config file
               </div>
             </div>
           </a>

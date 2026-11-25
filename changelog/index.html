@@ -677,6 +677,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../configuration/config-file/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Repository config file
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../configuration/custom-prompts/" class="md-nav__link">
         
   
@@ -942,13 +965,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#010" class="md-nav__link">
+  <a href="#020" class="md-nav__link">
     <span class="md-ellipsis">
-      0.1.0
+      0.2.0
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="0.1.0">
+    <nav class="md-nav" aria-label="0.2.0">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -971,6 +994,48 @@
         
           <li class="md-nav__item">
   <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fixed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#010" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.1.0
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed_1" class="md-nav__link">
     <span class="md-ellipsis">
       Fixed
     </span>
@@ -1049,13 +1114,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#010" class="md-nav__link">
+  <a href="#020" class="md-nav__link">
     <span class="md-ellipsis">
-      0.1.0
+      0.2.0
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="0.1.0">
+    <nav class="md-nav" aria-label="0.2.0">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1078,6 +1143,48 @@
         
           <li class="md-nav__item">
   <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fixed
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#010" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.1.0
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed_1" class="md-nav__link">
     <span class="md-ellipsis">
       Fixed
     </span>
@@ -1124,8 +1231,44 @@
 
 
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
-<h2 id="010">0.1.0<a class="headerlink" href="#010" title="Permanent link">&para;</a></h2>
+<h2 id="020">0.2.0<a class="headerlink" href="#020" title="Permanent link">&para;</a></h2>
 <h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Exact-line comments with severity.</strong> The model now answers in JSON (line, severity, comment, optional fix), so each comment is placed on the line it is about instead of the end of the hunk. Fixes are posted as one-click GitLab <code>suggestion</code> blocks.</li>
+<li><strong>No duplicate comments on new pushes.</strong> The summary note records the last reviewed commit. A rerun on the same commit does nothing, a new push reviews only the files that changed, and a line that already has a comment from the tool is not commented on again. The summary note is updated in place.</li>
+<li><strong>Better context.</strong> Each file is reviewed as a whole (all its hunks in one request), together with the full file content when it is small enough (<code>--file-context-chars</code>) and the MR title and description.</li>
+<li><strong>Noise controls:</strong> <code>--include</code> / <code>--exclude</code> globs with built-in excludes for lockfiles, vendored, minified and generated files; <code>--min-severity</code>; <code>--max-files</code>; <code>--max-file-diff-lines</code>.</li>
+<li><code>--fail-on &lt;severity&gt;</code> to fail the job (and block merges) on serious findings.</li>
+<li><code>--dry-run</code> prints the comments and the summary instead of posting them.</li>
+<li><code>.ai-review.yml</code> repository config file (<code>--config</code>).</li>
+<li><code>--concurrency</code> (default 2) to review files in parallel, and <code>--timeout</code> for AI requests.</li>
+<li>Token usage (including cached tokens) is logged at the end of each run.</li>
+<li>Anthropic: the system prompt is cached across files (prompt caching), and server-side refusal fallbacks are enabled on models that support them.</li>
+<li>CI template inputs <code>min_severity</code> and <code>fail_on</code>.</li>
+</ul>
+<h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>New default prompts focused on bugs, security and real performance problems: no praise sections, no style nitpicks, no blanket "add unit tests".</li>
+<li>The Anthropic provider uses the official <code>@anthropic-ai/sdk</code>.</li>
+<li>A custom prompt that cannot be loaded now fails the job instead of silently using the default prompt.</li>
+<li>The job exits with code 1 when any file could not be reviewed or a comment could not be posted. The summary note lists what failed.</li>
+<li>The CI template's default image is pinned to the release instead of <code>latest</code>.</li>
+<li><code>typescript</code> and <code>@types/*</code> moved to <code>devDependencies</code>, so <code>npx</code> installs less.</li>
+</ul>
+<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>MRs with more than 20 files were only partly reviewed</strong>: the <code>/diffs</code> endpoint is paginated and only the first page was read.</li>
+<li><strong>Bedrock requests failed on current Claude models</strong>, which reject <code>temperature</code> and <code>top_p</code>. Sampling parameters are no longer sent to any provider.</li>
+<li><strong>The Gemini API key could leak into CI logs</strong>: it was sent in the URL and failed requests were logged in full. It is now sent in the <code>x-goog-api-key</code> header, and errors are logged without URLs or headers. The fake browser <code>User-Agent</code> was removed.</li>
+<li><strong>Rate limits could loop forever and re-bill the model</strong>: retries are now bounded (4 attempts, exponential backoff, <code>Retry-After</code> honoured), cover 5xx and network errors, work for every provider, and never repeat the model call when only posting to GitLab failed.</li>
+<li>Hunk headers without a line count (<code>@@ -5 +5 @@</code>) put comments one line off.</li>
+<li><code>\ No newline at end of file</code> was treated as a code line and could make GitLab reject the comment.</li>
+<li>Files that were renamed <em>and</em> modified were not reviewed.</li>
+<li>Comments that GitLab rejects because of their position are posted as a general MR comment instead of being lost.</li>
+<li>No timeouts on HTTP requests: a stuck provider could hang the job until the CI timeout.</li>
+</ul>
+<h2 id="010">0.1.0<a class="headerlink" href="#010" title="Permanent link">&para;</a></h2>
+<h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Zero-flag GitLab CI setup</strong>: project ID, MR IID and API URL are read from <code>CI_MERGE_REQUEST_PROJECT_ID</code>, <code>CI_MERGE_REQUEST_IID</code> and <code>CI_API_V4_URL</code>. Every flag also has an environment-variable fallback (see the docs).</li>
 <li><strong>Anthropic API provider</strong> (<code>--ai-provider anthropic</code>).</li>
@@ -1136,7 +1279,7 @@
 <li>Small "Reviewed by" footer on the summary note. Disable it with <code>--no-attribution</code> or <code>AI_REVIEW_ATTRIBUTION=false</code>.</li>
 <li>Documentation site, test suite and CI.</li>
 </ul>
-<h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
+<h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Default Gemini model is now <code>gemini-3.5-flash</code> (<code>gemini-1.5-flash</code> has been retired).</li>
 <li>Default Bedrock model is now the <code>us.anthropic.claude-sonnet-5</code> inference profile.</li>
@@ -1145,7 +1288,7 @@
 <li>Missing configuration is reported all at once, with a clear message.</li>
 <li>GitLab connection failures now fail the job instead of continuing silently.</li>
 </ul>
-<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
+<h3 id="fixed_1">Fixed<a class="headerlink" href="#fixed_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>package.json</code> <code>main</code> and <code>description</code> (npm listing).</li>
 <li>Summary note line numbers no longer print <code>undefined</code>.</li>

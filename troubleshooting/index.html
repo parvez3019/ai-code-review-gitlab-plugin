@@ -677,6 +677,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../configuration/config-file/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Repository config file
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../configuration/custom-prompts/" class="md-nav__link">
         
   
@@ -925,6 +948,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#the-job-fails-after-posting-comments" class="md-nav__link">
+    <span class="md-ellipsis">
+      The job fails after posting comments
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#aws-bedrock" class="md-nav__link">
     <span class="md-ellipsis">
       AWS Bedrock
@@ -1079,6 +1111,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#the-job-fails-after-posting-comments" class="md-nav__link">
+    <span class="md-ellipsis">
+      The job fails after posting comments
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#aws-bedrock" class="md-nav__link">
     <span class="md-ellipsis">
       AWS Bedrock
@@ -1140,15 +1181,20 @@
 </ul>
 <h2 id="no-comments-appear">No comments appear<a class="headerlink" href="#no-comments-appear" title="Permanent link">&para;</a></h2>
 <ul>
-<li>The model may have answered <code>204</code> for every hunk. Look for "No Feedback Summary" on the MR.</li>
-<li>Renamed, deleted and binary files are skipped.</li>
-<li>Check the job log for <code>Failed to review &lt;file&gt;</code> lines.</li>
+<li>The model may have found nothing significant. The <strong>AI code review</strong> summary note lists the files with no comments.</li>
+<li>Files may have been skipped. The summary note lists files that were excluded by path filters, too large (<code>--max-file-diff-lines</code>) or over the file limit (<code>--max-files</code>).</li>
+<li>Findings below <code>--min-severity</code> are not posted.</li>
+<li>The commit may already have been reviewed: the tool reviews each commit once and only re-reviews files that changed. Use <code>--no-incremental</code> to review everything again.</li>
+<li>Deleted files, pure renames and binary files are skipped.</li>
+<li>Check the job log for <code>Failed to review &lt;file&gt;</code> lines. Run with <code>--dry-run</code> locally to see what the model returns.</li>
 </ul>
+<h2 id="the-job-fails-after-posting-comments">The job fails after posting comments<a class="headerlink" href="#the-job-fails-after-posting-comments" title="Permanent link">&para;</a></h2>
+<p>The job exits with code 1 when a file could not be reviewed or a comment could not be posted (see the summary note), or when <code>--fail-on</code> is set and a finding reaches that severity. The reusable CI template uses <code>allow_failure: true</code> by default, so this never blocks a merge unless you change it.</p>
 <h2 id="aws-bedrock">AWS Bedrock<a class="headerlink" href="#aws-bedrock" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>"The provided model identifier is invalid" / "on-demand throughput isn't supported"</strong>: use an inference profile ID (<code>us.anthropic.…</code>). See <a href="../providers/bedrock/#choosing-a-model-id">Bedrock</a>.</li>
 <li><strong>AccessDeniedException</strong>: enable model access in the Bedrock console and check the <a href="../providers/bedrock/#iam-permissions">IAM policy</a>.</li>
-<li><strong>Throttling</strong>: the client retries 429/5xx with exponential backoff. For large MRs, request a quota increase or use a smaller model.</li>
+<li><strong>Throttling</strong>: requests are retried with backoff (see below). For large MRs, request a quota increase, lower <code>--concurrency</code> or use a smaller model.</li>
 </ul>
 <h2 id="gemini">Gemini<a class="headerlink" href="#gemini" title="Permanent link">&para;</a></h2>
 <ul>
@@ -1156,7 +1202,7 @@
 <li><strong>400 API key not valid</strong>: create a new key in Google AI Studio.</li>
 </ul>
 <h2 id="rate-limits-any-provider">Rate limits (any provider)<a class="headerlink" href="#rate-limits-any-provider" title="Permanent link">&para;</a></h2>
-<p>On HTTP 429 the tool waits 60 seconds and re-queues the hunk, so very large MRs can take a while. Consider <code>when: manual</code> for huge MRs.</p>
+<p>Rate limits (429), server errors (5xx) and network errors are retried up to 4 times with exponential backoff, honouring <code>Retry-After</code>. If a file still fails, it is listed in the summary note, the job exits with code 1, and the file is reviewed again on the next run. Lower <code>--concurrency</code> (default 2) if you hit rate limits often.</p>
 
 
 

@@ -677,6 +677,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../configuration/config-file/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Repository config file
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../configuration/custom-prompts/" class="md-nav__link">
         
   
@@ -991,7 +1014,11 @@ Only the changed hunks, which keeps reviews focused and cheap.</p>
 <p><strong>Can I use it on GitHub?</strong>
 No. It's built for GitLab merge requests.</p>
 <p><strong>Can I stop it commenting on trivial things?</strong>
-Yes. Tighten the <a href="../configuration/custom-prompts/">custom prompt</a>. Anything the model answers with <code>204</code> gets no comment.</p>
+Yes. Raise <code>--min-severity</code> to <code>major</code> (or <code>critical</code>) to post only important findings, and tighten the <a href="../configuration/custom-prompts/">custom prompt</a>.</p>
+<p><strong>Will it comment again on every push?</strong>
+No. The tool remembers the last reviewed commit in its summary note, reviews only files changed since then, and never posts a second comment on a line it has already commented on.</p>
+<p><strong>Can it block merges?</strong>
+Yes. Set <code>--fail-on major</code> (or <code>AI_REVIEW_FAIL_ON</code>) and <code>allow_failure: false</code> on the job.</p>
 <p><strong>Can I remove the "Reviewed by" footer?</strong>
 Yes. Use <code>--no-attribution</code> or <code>AI_REVIEW_ATTRIBUTION=false</code>. It only appears on the summary note.</p>
 

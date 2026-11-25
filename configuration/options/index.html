@@ -642,6 +642,19 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    CLI options
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -653,6 +666,58 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#review-behaviour" class="md-nav__link">
+    <span class="md-ellipsis">
+      Review behaviour
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Review behaviour">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-repeat-runs-behave" class="md-nav__link">
+    <span class="md-ellipsis">
+      How repeat runs behave
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exit-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exit codes
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -672,6 +737,29 @@
   
   <span class="md-ellipsis">
     Environment variables
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config-file/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Repository config file
     
   </span>
   
@@ -961,6 +1049,47 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#review-behaviour" class="md-nav__link">
+    <span class="md-ellipsis">
+      Review behaviour
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Review behaviour">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-repeat-runs-behave" class="md-nav__link">
+    <span class="md-ellipsis">
+      How repeat runs behave
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exit-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exit codes
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -984,7 +1113,7 @@
 
 
 <h1 id="cli-options">CLI options<a class="headerlink" href="#cli-options" title="Permanent link">&para;</a></h1>
-<p>Precedence: <strong>CLI flag → environment variable → default.</strong></p>
+<p>Precedence: <strong>CLI flag → environment variable → <a href="../config-file/">config file</a> → default.</strong></p>
 <table>
 <thead>
 <tr>
@@ -1090,6 +1219,126 @@
 <td><code>AI_REVIEW_ATTRIBUTION=false</code></td>
 <td>attribution on</td>
 <td>Remove the small "Reviewed by" footer from the summary note</td>
+</tr>
+</tbody>
+</table>
+<h2 id="review-behaviour">Review behaviour<a class="headerlink" href="#review-behaviour" title="Permanent link">&para;</a></h2>
+<p>These can also be set in <a href="../config-file/"><code>.ai-review.yml</code></a>.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Env fallback</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--config</code></td>
+<td><code>AI_REVIEW_CONFIG</code></td>
+<td><code>.ai-review.yml</code> if present</td>
+<td>Repository config file</td>
+</tr>
+<tr>
+<td><code>--include</code></td>
+<td><code>AI_REVIEW_INCLUDE</code></td>
+<td>everything</td>
+<td>Comma-separated globs; only matching files are reviewed</td>
+</tr>
+<tr>
+<td><code>--exclude</code></td>
+<td><code>AI_REVIEW_EXCLUDE</code></td>
+<td>–</td>
+<td>Comma-separated globs to skip, on top of the built-in excludes</td>
+</tr>
+<tr>
+<td><code>--no-default-excludes</code></td>
+<td><code>AI_REVIEW_DEFAULT_EXCLUDES=false</code></td>
+<td>excludes on</td>
+<td>Also review lockfiles, vendored, minified and generated files</td>
+</tr>
+<tr>
+<td><code>--min-severity</code></td>
+<td><code>AI_REVIEW_MIN_SEVERITY</code></td>
+<td><code>minor</code></td>
+<td>Lowest severity to post: <code>minor</code>, <code>major</code>, <code>critical</code></td>
+</tr>
+<tr>
+<td><code>--fail-on</code></td>
+<td><code>AI_REVIEW_FAIL_ON</code></td>
+<td><code>none</code></td>
+<td>Exit with code 1 when a finding is at or above this severity</td>
+</tr>
+<tr>
+<td><code>--max-files</code></td>
+<td><code>AI_REVIEW_MAX_FILES</code></td>
+<td><code>50</code></td>
+<td>Review at most this many files per run (<code>0</code> = no limit)</td>
+</tr>
+<tr>
+<td><code>--max-file-diff-lines</code></td>
+<td><code>AI_REVIEW_MAX_FILE_DIFF_LINES</code></td>
+<td><code>1500</code></td>
+<td>Skip files with more changed lines than this</td>
+</tr>
+<tr>
+<td><code>--file-context-chars</code></td>
+<td><code>AI_REVIEW_FILE_CONTEXT_CHARS</code></td>
+<td><code>30000</code></td>
+<td>Send the full file as context when it is at most this many characters (<code>0</code> = never)</td>
+</tr>
+<tr>
+<td><code>--concurrency</code></td>
+<td><code>AI_REVIEW_CONCURRENCY</code></td>
+<td><code>2</code></td>
+<td>Files reviewed in parallel</td>
+</tr>
+<tr>
+<td><code>--timeout</code></td>
+<td><code>AI_REVIEW_TIMEOUT</code></td>
+<td><code>120</code></td>
+<td>Seconds before an AI request times out</td>
+</tr>
+<tr>
+<td><code>--dry-run</code></td>
+<td><code>AI_REVIEW_DRY_RUN=true</code></td>
+<td>off</td>
+<td>Print comments and the summary instead of posting them</td>
+</tr>
+<tr>
+<td><code>--no-incremental</code></td>
+<td><code>AI_REVIEW_INCREMENTAL=false</code></td>
+<td>incremental on</td>
+<td>Review every file on every run</td>
+</tr>
+</tbody>
+</table>
+<h3 id="how-repeat-runs-behave">How repeat runs behave<a class="headerlink" href="#how-repeat-runs-behave" title="Permanent link">&para;</a></h3>
+<p>The summary note records the last fully reviewed commit. On the next pipeline the tool:</p>
+<ol>
+<li>Does nothing if that commit is the current head (for example, a retried job).</li>
+<li>Otherwise reviews only files changed since that commit. After a force push it reviews every file.</li>
+<li>Never posts a second comment on a line that already has one from the tool.</li>
+<li>Updates the same summary note instead of adding a new one.</li>
+</ol>
+<p>If any file fails to review, the checkpoint is not moved forward, so the next run tries again.</p>
+<h2 id="exit-codes">Exit codes<a class="headerlink" href="#exit-codes" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0</code></td>
+<td>Review finished</td>
+</tr>
+<tr>
+<td><code>1</code></td>
+<td>Invalid configuration, GitLab unreachable, a file could not be reviewed or a comment could not be posted, or a finding reached <code>--fail-on</code></td>
 </tr>
 </tbody>
 </table>

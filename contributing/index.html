@@ -675,6 +675,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../configuration/config-file/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Repository config file
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../configuration/custom-prompts/" class="md-nav__link">
         
   
@@ -1193,7 +1216,7 @@
 </table>
 <h3 id="adding-a-provider">Adding a provider<a class="headerlink" href="#adding-a-provider" title="Permanent link">&para;</a></h3>
 <ol>
-<li>Implement <code>AICodeReviewClient</code> in <code>src/&lt;provider&gt;.ts</code>. Re-throw HTTP errors so that <code>error.response.status === 429</code> triggers the retry.</li>
+<li>Implement <code>AICodeReviewClient</code> (<code>complete({system, user})</code>) in <code>src/&lt;provider&gt;.ts</code>. Throw the provider's original error, with its HTTP status, so <code>withRetry()</code> in <code>src/retry.ts</code> can retry 429s and 5xx. Never log request URLs or headers.</li>
 <li>Add it to <code>PROVIDERS</code> and the env-var mapping in <code>src/config.ts</code>.</li>
 <li>Wire it in <code>createAIClient()</code> in <code>src/index.ts</code>.</li>
 <li>Add a test in <code>test/providers.test.js</code> (there's a tiny fake HTTP server helper) and a page under <code>docs/providers/</code>.</li>

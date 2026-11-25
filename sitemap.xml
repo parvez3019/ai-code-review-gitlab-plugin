@@ -2,82 +2,86 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
     </url>
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/changelog/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
     </url>
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/comparison/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
     </url>
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/contributing/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
     </url>
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/faq/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
     </url>
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/troubleshooting/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
+    </url>
+    <url>
+         <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/configuration/config-file/</loc>
+         <lastmod>2026-11-25</lastmod>
     </url>
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/configuration/custom-prompts/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
     </url>
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/configuration/env-vars/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
     </url>
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/configuration/options/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
     </url>
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/ci-template/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
     </url>
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/cli/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
     </url>
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/docker/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
     </url>
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/getting-started/gitlab-ci/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
     </url>
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/guides/self-hosted-gitlab/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
     </url>
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/guides/trigger-via-api/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
     </url>
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/guides/webhook-trigger/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
     </url>
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/providers/anthropic/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
     </url>
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/providers/bedrock/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
     </url>
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/providers/gemini/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
     </url>
     <url>
          <loc>https://parvez3019.github.io/ai-code-review-gitlab-plugin/providers/openai-compatible/</loc>
-         <lastmod>2026-11-18</lastmod>
+         <lastmod>2026-11-25</lastmod>
     </url>
 </urlset>

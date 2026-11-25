@@ -748,6 +748,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../../configuration/config-file/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Repository config file
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../configuration/custom-prompts/" class="md-nav__link">
         
   
@@ -1116,13 +1139,23 @@
 </tr>
 <tr>
 <td><code>image</code></td>
-<td><code>ghcr.io/parvez3019/ai-code-review-gitlab-plugin:latest</code></td>
-<td>Image that contains the CLI</td>
+<td><code>ghcr.io/parvez3019/ai-code-review-gitlab-plugin:&lt;release&gt;</code></td>
+<td>Image that contains the CLI, pinned to the same release as the template</td>
 </tr>
 <tr>
 <td><code>allow_failure</code></td>
 <td><code>true</code></td>
 <td>Don't block the pipeline if the review fails</td>
+</tr>
+<tr>
+<td><code>min_severity</code></td>
+<td><code>minor</code></td>
+<td>Lowest severity posted as a comment: <code>minor</code>, <code>major</code>, <code>critical</code></td>
+</tr>
+<tr>
+<td><code>fail_on</code></td>
+<td><code>none</code></td>
+<td>Fail the job on a finding at or above this severity</td>
 </tr>
 <tr>
 <td><code>when</code></td>
