@@ -1,6 +1,5 @@
 import axios, {AxiosInstance} from 'axios';
-import {AICodeReviewClient, AIClientConfig} from './ai-client';
-import {getSystemPrompt, getCodeReviewPrompt} from './utils';
+import {AICodeReviewClient, AIClientConfig, DEFAULT_TIMEOUT_MS, ReviewRequest, ReviewResponse} from './ai-client';
 
 const DEFAULT_OPENAI_BASE_URL = 'https://api.openai.com/v1';
 
@@ -11,13 +10,11 @@ const DEFAULT_OPENAI_BASE_URL = 'https://api.openai.com/v1';
 export class OpenAICompatibleClient implements AICodeReviewClient {
     private apiClient: AxiosInstance;
     private model: string;
-    private config: AIClientConfig;
 
     constructor(config: AIClientConfig) {
         if (!config.model) {
             throw new Error('A model is required for the OpenAI-compatible client');
         }
-        this.config = config;
         this.model = config.model;
         const headers: Record<string, string> = {'content-type': 'application/json'};
         if (config.apiKey) {
@@ -26,35 +23,26 @@ export class OpenAICompatibleClient implements AICodeReviewClient {
         this.apiClient = axios.create({
             baseURL: (config.apiUrl || DEFAULT_OPENAI_BASE_URL).replace(/\/+$/, ''),
             headers,
+            timeout: config.timeoutMs ?? DEFAULT_TIMEOUT_MS,
         });
     }
 
-    async reviewCodeChange(change: string): Promise<string> {
-        if (!change?.trim()) {
-            throw new Error('Code change cannot be empty');
+    async complete({system, user}: ReviewRequest): Promise<ReviewResponse> {
+        const response = await this.apiClient.post('/chat/completions', {
+            model: this.model,
+            messages: [
+                {role: 'system', content: system},
+                {role: 'user', content: user},
+            ],
+        });
+        const text = response.data?.choices?.[0]?.message?.content?.trim();
+        if (!text) {
+            throw new Error('Empty response from the OpenAI-compatible endpoint');
         }
-
-        const [systemPrompt, codeReviewPrompt] = await Promise.all([
-            this.config.systemPrompt || getSystemPrompt(),
-            this.config.codeReviewPrompt || getCodeReviewPrompt(),
-        ]);
-
-        try {
-            const response = await this.apiClient.post('/chat/completions', {
-                model: this.model,
-                messages: [
-                    {role: 'system', content: `${systemPrompt}\n\n${codeReviewPrompt}`},
-                    {role: 'user', content: change},
-                ],
-            });
-            const text = response.data?.choices?.[0]?.message?.content?.trim();
-            if (!text) {
-                throw new Error('Invalid response format from OpenAI-compatible endpoint');
-            }
-            return text;
-        } catch (error: any) {
-            console.error('Error calling OpenAI-compatible endpoint:', error?.response?.data || error?.message || error);
-            throw error;
-        }
+        const usage = response.data?.usage;
+        return {
+            text,
+            usage: usage ? {inputTokens: usage.prompt_tokens ?? 0, outputTokens: usage.completion_tokens ?? 0} : undefined,
+        };
     }
 }

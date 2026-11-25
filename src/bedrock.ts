@@ -1,126 +1,69 @@
-import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
-import { AICodeReviewClient, AIClientConfig } from "./ai-client";
-import { getSystemPrompt, getCodeReviewPrompt } from "./utils";
+import {BedrockRuntimeClient, InvokeModelCommand} from '@aws-sdk/client-bedrock-runtime';
+import {AICodeReviewClient, AIClientConfig, DEFAULT_TIMEOUT_MS, MAX_OUTPUT_TOKENS, ReviewRequest, ReviewResponse} from './ai-client';
 
 // Newer Claude models on Bedrock must be invoked through a cross-region inference profile.
-export const DEFAULT_BEDROCK_MODEL = "us.anthropic.claude-sonnet-5";
+export const DEFAULT_BEDROCK_MODEL = 'us.anthropic.claude-sonnet-5';
 
-// Types for Bedrock response
 interface BedrockResponse {
-    content: Array<{
-        text: string;
-    }>;
-}
-
-interface BedrockError extends Error {
-    $metadata?: {
-        httpStatusCode?: number;
-        requestId?: string;
-    };
+    content?: Array<{type?: string; text?: string}>;
+    stop_reason?: string;
+    usage?: {input_tokens?: number; output_tokens?: number; cache_read_input_tokens?: number};
 }
 
 export class BedrockClient implements AICodeReviewClient {
     private client: BedrockRuntimeClient;
     private model: string;
-    private readonly maxRetries = 3;
-    private readonly retryDelay = 1000; // 1 second
-    private config: AIClientConfig;
 
     constructor(config: AIClientConfig) {
         if (!config.apiKey || !config.apiSecret) {
-            throw new Error("AWS credentials (apiKey and apiSecret) are required for Bedrock client");
+            throw new Error('AWS credentials (apiKey and apiSecret) are required for Bedrock client');
         }
-
-        this.config = config;
         this.client = new BedrockRuntimeClient({
-            region: config.region || process.env.AWS_REGION || "us-east-1",
-            credentials: {
-                accessKeyId: config.apiKey,
-                secretAccessKey: config.apiSecret,
-            },
+            region: config.region || 'us-east-1',
+            credentials: {accessKeyId: config.apiKey, secretAccessKey: config.apiSecret},
+            // Retries are handled by withRetry() so every provider behaves the same way.
+            maxAttempts: 1,
+            requestHandler: {requestTimeout: config.timeoutMs ?? DEFAULT_TIMEOUT_MS} as any,
         });
-
-        // Explicit config wins, then environment variable, then default model
-        this.model = config.model || process.env.AWS_BEDROCK_MODEL || DEFAULT_BEDROCK_MODEL;
+        this.model = config.model || DEFAULT_BEDROCK_MODEL;
     }
 
-    private async sleep(ms: number): Promise<void> {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    private async retryWithBackoff<T>(operation: () => Promise<T>, retryCount = 0): Promise<T> {
-        try {
-            return await operation();
-        } catch (error) {
-            const bedrockError = error as BedrockError;
-            
-            // Check if error is retryable
-            const isRetryable = 
-                bedrockError.$metadata?.httpStatusCode === 429 || // Rate limit
-                bedrockError.$metadata?.httpStatusCode === 500 || // Server error
-                bedrockError.$metadata?.httpStatusCode === 503;   // Service unavailable
-
-            if (isRetryable && retryCount < this.maxRetries) {
-                const delay = this.retryDelay * Math.pow(2, retryCount);
-                console.log(`Retrying after ${delay}ms (attempt ${retryCount + 1}/${this.maxRetries})`);
-                await this.sleep(delay);
-                return this.retryWithBackoff(operation, retryCount + 1);
-            }
-            throw error;
-        }
-    }
-
-    async reviewCodeChange(change: string): Promise<string> {
-        if (!change?.trim()) {
-            throw new Error("Code change cannot be empty");
-        }
-
-        const [systemPrompt, codeReviewPrompt] = await Promise.all([
-            this.config.systemPrompt || getSystemPrompt(),
-            this.config.codeReviewPrompt || getCodeReviewPrompt()
-        ]);
-
-        const prompt = `${systemPrompt}\n\n${codeReviewPrompt}\n\n${change}`;
-
+    async complete({system, user}: ReviewRequest): Promise<ReviewResponse> {
         const command = new InvokeModelCommand({
             modelId: this.model,
-            contentType: "application/json",
-            accept: "application/json",
+            contentType: 'application/json',
+            accept: 'application/json',
+            // No temperature/top_p: current Claude models reject sampling parameters.
             body: JSON.stringify({
-                anthropic_version: "bedrock-2023-05-31",
-                max_tokens: 4096,
-                temperature: 0.7,
-                top_p: 0.95,
-                messages: [
-                    {
-                        role: "user",
-                        content: prompt,
-                    },
-                ],
+                anthropic_version: 'bedrock-2023-05-31',
+                max_tokens: MAX_OUTPUT_TOKENS,
+                system,
+                messages: [{role: 'user', content: user}],
             }),
         });
 
-        try {
-            const response = await this.retryWithBackoff(async () => {
-                const result = await this.client.send(command);
-                const responseBody = JSON.parse(new TextDecoder().decode(result.body)) as BedrockResponse;
-                
-                if (!responseBody?.content?.[0]?.text) {
-                    throw new Error("Invalid response format from Bedrock");
-                }
-                
-                return responseBody.content[0].text;
-            });
-
-            return response;
-        } catch (error) {
-            const bedrockError = error as BedrockError;
-            console.error("Error calling Bedrock:", {
-                error: bedrockError.message,
-                statusCode: bedrockError.$metadata?.httpStatusCode,
-                requestId: bedrockError.$metadata?.requestId
-            });
-            throw new Error(`Failed to get code review from Bedrock: ${bedrockError.message}`);
+        const result = await this.client.send(command);
+        const body = JSON.parse(new TextDecoder().decode(result.body)) as BedrockResponse;
+        if (body.stop_reason === 'refusal') {
+            throw new Error('Bedrock declined to review this change (stop_reason: refusal)');
         }
+        const text = (body.content || [])
+            .filter((block) => !block.type || block.type === 'text')
+            .map((block) => block.text || '')
+            .join('\n')
+            .trim();
+        if (!text) {
+            throw new Error(`Empty response from Bedrock (stop_reason: ${body.stop_reason ?? 'unknown'})`);
+        }
+        return {
+            text,
+            usage: body.usage
+                ? {
+                    inputTokens: body.usage.input_tokens ?? 0,
+                    outputTokens: body.usage.output_tokens ?? 0,
+                    cacheReadTokens: body.usage.cache_read_input_tokens ?? 0,
+                }
+                : undefined,
+        };
     }
-} 
+}

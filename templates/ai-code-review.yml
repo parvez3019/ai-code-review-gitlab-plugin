@@ -11,12 +11,21 @@ spec:
       default: ''
       description: Model ID. Leave empty to use the provider default.
     image:
-      default: ghcr.io/parvez3019/ai-code-review-gitlab-plugin:latest
+      # Pinned to the release this template ships with; bump on every release.
+      default: ghcr.io/parvez3019/ai-code-review-gitlab-plugin:0.2.0
       description: Container image that has the CLI installed.
     allow_failure:
       default: true
       type: boolean
       description: Do not block the pipeline if the review fails.
+    min_severity:
+      default: minor
+      options: [minor, major, critical]
+      description: Lowest severity of finding to post as a comment.
+    fail_on:
+      default: none
+      options: [none, minor, major, critical]
+      description: Fail the job when a finding is at or above this severity.
     when:
       default: on_success
       options: [on_success, manual]
@@ -28,6 +37,8 @@ ai-code-review:
   variables:
     AI_PROVIDER: $[[ inputs.provider ]]
     AI_MODEL: $[[ inputs.model ]]
+    AI_REVIEW_MIN_SEVERITY: $[[ inputs.min_severity ]]
+    AI_REVIEW_FAIL_ON: $[[ inputs.fail_on ]]
   script:
     - ai-code-review-gitlab-plugin
   allow_failure: $[[ inputs.allow_failure ]]

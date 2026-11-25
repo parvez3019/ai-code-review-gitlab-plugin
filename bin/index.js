@@ -2,7 +2,11 @@
 
 const run = require('../lib/index.js');
 
-run().catch(error => {
-    console.error(error);
-    process.exit(1);
-});
+run()
+    .then((code) => {
+        process.exitCode = code;
+    })
+    .catch((error) => {
+        console.error(error);
+        process.exitCode = 1;
+    });

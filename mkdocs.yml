@@ -80,6 +80,7 @@ nav:
   - Configuration:
       - CLI options: configuration/options.md
       - Environment variables: configuration/env-vars.md
+      - Repository config file: configuration/config-file.md
       - Custom prompts: configuration/custom-prompts.md
   - Guides:
       - Trigger on reviewer assignment (webhook): guides/webhook-trigger.md

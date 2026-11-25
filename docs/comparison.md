@@ -14,7 +14,7 @@ There are several good ways to get AI review on GitLab merge requests. Here's an
 | Setup | One CI job / one `include` | Enable the add-on | Install app | Webhook server or CI job |
 | Inline line comments | ✅ | ✅ | ✅ | ✅ |
 | Custom prompts from S3 / repo | ✅ | – | Config-based | Config-based |
-| Footprint | <1,000 lines of TypeScript, single CLI | – | – | Large Python project with many tools |
+| Footprint | <2,000 lines of TypeScript, single CLI | – | – | Large Python project with many tools |
 
 ## When to choose this project
 

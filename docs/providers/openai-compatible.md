@@ -51,4 +51,4 @@ The `openai` provider talks to any server that implements the OpenAI **Chat Comp
     ```
 
 !!! tip
-    Smaller local models follow the "reply `204` when there is nothing significant" instruction less reliably. If you get noisy reviews, try a larger model or tighten the [prompt](../configuration/custom-prompts.md).
+    Smaller local models follow the JSON output format less reliably. When an answer isn't valid JSON, it is posted as one comment on the last changed line of the file. If you get noisy reviews, try a larger model, raise `--min-severity`, or tighten the [prompt](../configuration/custom-prompts.md).

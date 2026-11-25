@@ -1,79 +1,110 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const http = require('node:http');
 const {AnthropicClient} = require('../lib/anthropic');
 const {OpenAICompatibleClient} = require('../lib/openai');
+const {Gemini} = require('../lib/gemini');
+const {statusOf} = require('../lib/retry');
+const {fakeServer} = require('./helpers');
 
-/** Start a throwaway HTTP server that records the request and returns `reply`. */
-function fakeServer(reply, status = 200) {
-    return new Promise((resolve) => {
-        const seen = {};
-        const server = http.createServer((req, res) => {
-            let body = '';
-            req.on('data', (c) => (body += c));
-            req.on('end', () => {
-                Object.assign(seen, {method: req.method, url: req.url, headers: req.headers, body: JSON.parse(body)});
-                res.writeHead(status, {'content-type': 'application/json'});
-                res.end(JSON.stringify(reply));
-            });
-        });
-        server.listen(0, '127.0.0.1', () => {
-            resolve({server, seen, url: `http://127.0.0.1:${server.address().port}`});
-        });
-    });
-}
+const request = {system: 'SYS', user: 'DIFF'};
 
-const prompts = {systemPrompt: 'SYS', codeReviewPrompt: 'REVIEW'};
-
-test('AnthropicClient calls the Messages API and returns text', async () => {
-    const {server, seen, url} = await fakeServer({content: [{type: 'text', text: 'looks good'}]});
+test('AnthropicClient caches the system prompt and reports usage', async () => {
+    const srv = await fakeServer(() => ({body: {
+        id: 'msg_1', type: 'message', role: 'assistant', model: 'claude-test', stop_reason: 'end_turn',
+        content: [{type: 'text', text: '{"comments":[]}'}],
+        usage: {input_tokens: 10, output_tokens: 5, cache_read_input_tokens: 90, cache_creation_input_tokens: 0},
+    }}));
     try {
-        const client = new AnthropicClient({apiKey: 'k', apiUrl: url, model: 'claude-test', ...prompts});
-        assert.strictEqual(await client.reviewCodeChange('@@ -1 +1 @@\n+x'), 'looks good');
-        assert.strictEqual(seen.url, '/v1/messages');
-        assert.strictEqual(seen.headers['x-api-key'], 'k');
-        assert.strictEqual(seen.headers['anthropic-version'], '2023-06-01');
-        assert.strictEqual(seen.body.model, 'claude-test');
-        assert.strictEqual(seen.body.system, 'SYS\n\nREVIEW');
-        assert.deepStrictEqual(seen.body.messages, [{role: 'user', content: '@@ -1 +1 @@\n+x'}]);
+        const client = new AnthropicClient({apiKey: 'k', apiUrl: srv.url, model: 'claude-test'});
+        const result = await client.complete(request);
+        assert.strictEqual(result.text, '{"comments":[]}');
+        assert.deepStrictEqual(result.usage, {inputTokens: 10, outputTokens: 5, cacheReadTokens: 90});
+        const seen = srv.requests[0];
+        assert.strictEqual(seen.path, '/v1/messages');
+        assert.strictEqual(seen.headers.authorization, 'Bearer k');
+        assert.deepStrictEqual(seen.body.system, [{type: 'text', text: 'SYS', cache_control: {type: 'ephemeral'}}]);
+        assert.deepStrictEqual(seen.body.messages, [{role: 'user', content: 'DIFF'}]);
+        assert.strictEqual(seen.body.temperature, undefined);
+        assert.strictEqual(seen.body.fallbacks, undefined, 'no fallbacks through a custom base URL');
     } finally {
-        server.close();
+        srv.close();
     }
 });
 
-test('OpenAICompatibleClient calls chat/completions and returns content', async () => {
-    const {server, seen, url} = await fakeServer({choices: [{message: {content: ' 204 '}}]});
+test('AnthropicClient keeps the HTTP status on errors so they can be retried', async () => {
+    const srv = await fakeServer(() => ({status: 429, body: {type: 'error', error: {type: 'rate_limit_error', message: 'slow down'}}}));
     try {
-        const client = new OpenAICompatibleClient({apiKey: 'sk', apiUrl: `${url}/v1/`, model: 'gpt-test', ...prompts});
-        assert.strictEqual(await client.reviewCodeChange('diff'), '204');
-        assert.strictEqual(seen.url, '/v1/chat/completions');
-        assert.strictEqual(seen.headers.authorization, 'Bearer sk');
-        assert.strictEqual(seen.body.messages[0].role, 'system');
+        const client = new AnthropicClient({apiKey: 'k', apiUrl: srv.url});
+        await assert.rejects(client.complete(request), (e) => statusOf(e) === 429);
     } finally {
-        server.close();
+        srv.close();
+    }
+});
+
+test('AnthropicClient surfaces refusals as errors', async () => {
+    const srv = await fakeServer(() => ({body: {
+        id: 'msg_1', type: 'message', role: 'assistant', model: 'm', stop_reason: 'refusal',
+        stop_details: {type: 'refusal', category: 'cyber'}, content: [], usage: {input_tokens: 1, output_tokens: 0},
+    }}));
+    try {
+        const client = new AnthropicClient({apiKey: 'k', apiUrl: srv.url});
+        await assert.rejects(client.complete(request), /declined.*cyber/);
+    } finally {
+        srv.close();
+    }
+});
+
+test('OpenAICompatibleClient calls chat/completions', async () => {
+    const srv = await fakeServer(() => ({body: {choices: [{message: {content: ' {"comments":[]} '}}], usage: {prompt_tokens: 3, completion_tokens: 2}}}));
+    try {
+        const client = new OpenAICompatibleClient({apiKey: 'sk', apiUrl: `${srv.url}/v1/`, model: 'gpt-test'});
+        const result = await client.complete(request);
+        assert.strictEqual(result.text, '{"comments":[]}');
+        assert.deepStrictEqual(result.usage, {inputTokens: 3, outputTokens: 2});
+        const seen = srv.requests[0];
+        assert.strictEqual(seen.path, '/v1/chat/completions');
+        assert.strictEqual(seen.headers.authorization, 'Bearer sk');
+        assert.deepStrictEqual(seen.body.messages, [{role: 'system', content: 'SYS'}, {role: 'user', content: 'DIFF'}]);
+    } finally {
+        srv.close();
     }
 });
 
 test('OpenAICompatibleClient sends no Authorization header without a key (Ollama)', async () => {
-    const {server, seen, url} = await fakeServer({choices: [{message: {content: 'ok'}}]});
+    const srv = await fakeServer(() => ({body: {choices: [{message: {content: 'ok'}}]}}));
     try {
-        const client = new OpenAICompatibleClient({apiKey: '', apiUrl: url, model: 'llama', ...prompts});
-        await client.reviewCodeChange('diff');
-        assert.strictEqual(seen.headers.authorization, undefined);
+        await new OpenAICompatibleClient({apiKey: '', apiUrl: srv.url, model: 'llama'}).complete(request);
+        assert.strictEqual(srv.requests[0].headers.authorization, undefined);
     } finally {
-        server.close();
+        srv.close();
     }
 });
 
-test('provider errors keep the HTTP status so 429s can be retried', async () => {
-    const {server, url} = await fakeServer({error: 'rate limited'}, 429);
-    const origError = console.error;
-    console.error = () => {};
+test('Gemini sends the API key in a header, never in the URL', async () => {
+    const srv = await fakeServer(() => ({body: {
+        candidates: [{content: {parts: [{text: '{"comments":[]}'}]}}],
+        usageMetadata: {promptTokenCount: 7, candidatesTokenCount: 3},
+    }}));
     try {
-        const client = new OpenAICompatibleClient({apiKey: 'k', apiUrl: url, model: 'm', ...prompts});
-        await assert.rejects(client.reviewCodeChange('diff'), (e) => e.response.status === 429);
+        const client = new Gemini({apiKey: 'SECRET', apiUrl: srv.url, model: 'gemini-test'});
+        const result = await client.complete(request);
+        assert.strictEqual(result.text, '{"comments":[]}');
+        const seen = srv.requests[0];
+        assert.strictEqual(seen.path, '/v1beta/models/gemini-test:generateContent');
+        assert.deepStrictEqual(seen.query, {});
+        assert.strictEqual(seen.headers['x-goog-api-key'], 'SECRET');
+        assert.doesNotMatch(seen.headers['user-agent'] || '', /Mozilla/);
+        assert.deepStrictEqual(seen.body.systemInstruction, {parts: [{text: 'SYS'}]});
     } finally {
-        console.error = origError;
-        server.close();
+        srv.close();
+    }
+});
+
+test('Gemini errors keep their HTTP status', async () => {
+    const srv = await fakeServer(() => ({status: 429, body: {error: {message: 'quota'}}}));
+    try {
+        await assert.rejects(new Gemini({apiKey: 'k', apiUrl: srv.url}).complete(request), (e) => statusOf(e) === 429);
+    } finally {
+        srv.close();
     }
 });

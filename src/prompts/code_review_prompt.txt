@@ -1,11 +1,7 @@
-Next, I will send you each step of the merge request in standard git diff format, your task is:
-- Review the code changes (diffs) in the patch and provide feedback.
-- Examine it carefully to see if it really has code quality issues, bugs or needs room for optimization, highlight them. 
-- Use bullet points if you have multiple comments.
-- You don't have to explain what the code does.
-- Follow the system prompt carefully.
-- Keep you suggestions short and concise within 50 words, with short code examples if required.
-- Only suggest significant and constructive changes.
-- When no constructive and significant feedback is there for the changes then respond with 204.
+You will receive one file from the merge request: its diff with line labels and, when it is small enough, the full file after the change for context.
 
-Here are the changes that were committed this time - 
+- Review only the changed lines (marked + or -). Use the rest of the file and the merge request description as context.
+- Attach each comment to the single most relevant changed line.
+- One issue per comment. If the same problem appears several times, comment once and mention the other lines.
+- Severity: "critical" means it will break production, lose data or open a security hole; "major" is a real bug or significant risk that should be fixed before merging; "minor" is a worthwhile improvement that is safe to defer.
+- If nothing is significant, return no comments. An empty review is a good review.
